@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v120 - Final Touch</title>
+  <title>Kopi Setengah-4 v121 - Admin Restored</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -19,20 +19,9 @@
     .main-container { width: 94%; margin: 0 auto; padding: 15px 0; }
     .glass-card { background: var(--card-bg); border-radius: 16px; padding: 18px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
     
-    /* ANIMASI POP-UP & BLINK */
-    @keyframes shiftPop {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-        100% { transform: scale(1); }
-    }
+    @keyframes shiftPop { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; background: #16a34a; } 100% { opacity: 1; } }
-    
-    .btn-active-pop { 
-        animation: shiftPop 0.3s ease-out, blink 0.8s infinite ease-in-out; 
-        border: 2px solid #fff !important; 
-        background: #16a34a !important; 
-        z-index: 10;
-    }
+    .btn-active-pop { animation: shiftPop 0.3s ease-out, blink 0.8s infinite ease-in-out; border: 2px solid #fff !important; background: #16a34a !important; }
 
     .table-wrapper { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #0f172a; }
     .pro-table { width: 100%; table-layout: fixed; border-collapse: collapse; }
@@ -43,49 +32,35 @@
     .btn-gold { background: var(--gold); color: #000; box-shadow: 0 4px 0 #8e6d35; }
     .btn-dark { background: #334155; color: #cbd5e1; border: 1px solid #475569; }
     .input-pro { background: #fff !important; color: #000 !important; width: 100%; border-radius: 10px; font-weight: 700; height: 44px; text-align: center; border: 2px solid var(--gold); outline: none; font-size: 12px; }
+    #previewOverlay { background: var(--dark-bg); position: fixed; inset: 0; z-index: 2000; padding: 15px; overflow-y: auto; }
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
 <div class="main-container">
-  <div id="home" class="text-center py-24">
-    <h1 class="text-4xl font-black text-[#c29851] italic mb-14 tracking-tighter uppercase">Kopi Setengah-4</h1>
+  <div id="home" class="text-center py-20">
+    <h1 class="text-4xl font-black text-[#c29851] italic mb-12 tracking-tighter uppercase">Kopi Setengah-4</h1>
     <div class="glass-card">
         <button onclick="nav('karyawan')" class="btn-pro btn-gold mb-4"><i class="fas fa-fingerprint mr-3"></i> ABSEN MASUK</button>
-        <button onclick="nav('admin')" class="btn-pro btn-dark"><i class="fas fa-user-shield mr-3"></i> DASHBOARD ADMIN</button>
-    </div>
-  </div>
-
-  <div id="formAbsen" class="hidden">
-    <div class="glass-card text-center">
-        <p class="text-[10px] text-gold font-bold mb-4 uppercase italic">Pilih Lokasi Cabang</p>
-        <select id="selCabAbsen" class="input-pro mb-6" onchange="updateShiftUI()">
-            <option value="">-- CABANG --</option>
-        </select>
-        
-        <div id="shiftGrid" class="grid grid-cols-1 gap-4 mb-6"></div>
-        
-        <div id="finalAction" class="hidden border-t border-slate-700 pt-6">
-            <div class="bg-slate-900 rounded-xl p-4 mb-4 border border-slate-700 shadow-inner">
-                <p class="text-[9px] text-slate-500 uppercase font-bold tracking-widest">Konfirmasi Identitas</p>
-                <h3 id="nameConfirm" class="text-xl font-black text-white uppercase mt-1"></h3>
-                <p id="locStatus" class="text-[10px] font-bold mt-2 uppercase"></p>
-            </div>
-            <button id="sendBtn" class="btn-pro !bg-green-600 !text-white !h-[70px] shadow-lg shadow-green-900/40">
-                <i class="fas fa-paper-plane text-xl mb-1"></i>
-                KIRIM ABSEN SEKARANG
-            </button>
-        </div>
+        <button onclick="nav('admin')" class="btn-pro btn-dark"><i class="fas fa-user-shield mr-3"></i> PANEL ADMIN</button>
     </div>
   </div>
 
   <div id="dashboard" class="hidden">
     <div class="flex justify-between items-center mb-6">
-      <h2 class="text-lg font-black text-white italic uppercase">Admin Panel</h2>
+      <h2 class="text-lg font-black text-white italic uppercase">Admin Dashboard</h2>
       <button onclick="location.reload()" class="text-red-500 font-bold text-[10px] border border-red-500/30 px-3 py-1 rounded-full uppercase">Logout</button>
     </div>
+    
+    <div class="glass-card">
+        <p class="text-[10px] text-gold font-bold mb-3 uppercase text-center">Rekap Bulanan</p>
+        <div class="grid grid-cols-2 gap-2 mb-4"><select id="fBulan" class="input-pro"></select><select id="fTahun" class="input-pro"></select></div>
+        <button onclick="openRekap()" class="btn-pro btn-dark"><i class="fas fa-file-invoice mr-3"></i> TAMPILKAN REKAP</button>
+    </div>
+
     <div class="glass-card !p-2">
+      <p class="text-[10px] text-gold font-bold mb-3 uppercase text-center">Monitoring Harian</p>
       <div class="grid grid-cols-2 gap-2 p-1 mb-3">
         <select id="selCab" onchange="renderTable()" class="input-pro !h-[38px]"></select>
         <input type="date" id="selTgl" onchange="renderTable()" class="input-pro !h-[38px]">
@@ -97,10 +72,37 @@
         </table>
       </div>
     </div>
+
+    <div class="glass-card">
+        <p class="text-[10px] text-gold font-bold mb-6 uppercase text-center">Grafik Kedisiplinan</p>
+        <div class="space-y-10">
+            <div style="height:150px"><canvas id="chartS1"></canvas></div>
+            <div style="height:150px"><canvas id="chartS2"></canvas></div>
+        </div>
+    </div>
+  </div>
+
+  <div id="formAbsen" class="hidden">
+    <div class="glass-card text-center">
+        <select id="selCabAbsen" class="input-pro mb-6" onchange="updateShiftUI()"><option value="">-- PILIH CABANG --</option></select>
+        <div id="shiftGrid" class="grid grid-cols-1 gap-4 mb-6"></div>
+        <div id="finalAction" class="hidden border-t border-slate-700 pt-6">
+            <div class="bg-slate-900 rounded-xl p-4 mb-4 border border-slate-700 shadow-inner">
+                <h3 id="nameConfirm" class="text-xl font-black text-white uppercase"></h3>
+                <p id="locStatus" class="text-[10px] font-bold mt-2 uppercase"></p>
+            </div>
+            <button id="sendBtn" class="btn-pro !bg-green-600 !text-white !h-[70px]">KIRIM ABSEN SEKARANG</button>
+        </div>
+    </div>
   </div>
 
   <div id="karyawan" class="hidden"><div class="glass-card"><input id="inputID" placeholder="ID (KS4-XXXX)" class="input-pro"><button onclick="prosesLogin()" class="btn-pro btn-gold mt-4">LANJUT</button></div></div>
-  <div id="admin" class="hidden"><div class="glass-card"><input id="pinAdmin" type="password" placeholder="PIN" class="input-pro"><button onclick="loginAdmin()" class="btn-pro btn-gold mt-4">MASUK</button></div></div>
+  <div id="admin" class="hidden"><div class="glass-card"><input id="pinAdmin" type="password" placeholder="PIN" class="input-pro"><button onclick="loginAdmin()" class="btn-pro btn-gold mt-4">LOGIN</button></div></div>
+  
+  <div id="previewOverlay" class="hidden">
+    <div class="flex justify-between items-center mb-6"><button onclick="nav('dashboard')" class="text-white font-bold text-[11px] uppercase border border-slate-700 px-4 py-2 rounded-lg">← Kembali</button></div>
+    <div class="glass-card !p-2 !bg-[#0f172a]"><h2 id="periodTitle" class="text-center text-gold font-black text-[12px] my-6 uppercase"></h2><div class="table-wrapper"><table class="pro-table"><thead><tr><th style="width:30%">NAMA</th><th style="width:25%">CABANG</th><th style="width:20%">ABSEN</th><th style="width:25%">TELAT</th></tr></thead><tbody id="rekapBody"></tbody></table></div></div>
+  </div>
 </div>
 
 <script type="module">
@@ -111,18 +113,11 @@ const firebaseConfig = { apiKey: "AIzaSyChFAEgzpZac2yRvkb9r8f0kFT_j_ji1AA", auth
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const CABANG = { 
-    "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, 
-    "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, 
-    "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, 
-    "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, 
-    "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, 
-    "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9} 
-};
+const CABANG = { "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9} };
 const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin" };
 
+let logs = []; let uData = null; let chart1 = null, chart2 = null;
 const DEVID = localStorage.getItem('ks4_devid') || localStorage.setItem('ks4_devid', 'DEV-'+Math.random().toString(36).substr(2,9).toUpperCase()) || localStorage.getItem('ks4_devid');
-let uData = null;
 
 window.nav = (id) => {
     document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden'));
@@ -130,9 +125,55 @@ window.nav = (id) => {
     if(id==='dashboard') startSync();
 };
 
+function startSync() {
+    onValue(ref(db, 'absensi'), (snap) => {
+        logs = []; if(snap.exists()) Object.values(snap.val()).forEach(v => {
+            const d = v.timestamp ? new Date(v.timestamp) : new Date();
+            logs.push({...v, dt: d, iso: d.toISOString().split('T')[0]});
+        });
+        renderTable(); updateCharts();
+    });
+}
+
+window.renderTable = () => {
+    const bdy = document.getElementById('tBodyHarian');
+    const tgl = document.getElementById('selTgl').value || new Date().toISOString().split('T')[0];
+    const cab = document.getElementById('selCab').value;
+    if(!bdy) return; bdy.innerHTML = '';
+    logs.filter(l => l.iso === tgl && (cab==='Semua' || l.cabang===cab)).forEach(l => {
+        bdy.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}</td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td><td>${l.waktu}</td><td>${l.cabang.split(' ')[0]}</td><td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
+    });
+};
+
+function updateCharts() {
+    const ctx1 = document.getElementById('chartS1'), ctx2 = document.getElementById('chartS2');
+    if(!ctx1 || !ctx2) return;
+    const labels = Object.keys(CABANG).map(c => c.split(' ')[0]);
+    const d1 = Object.keys(CABANG).map(c => logs.filter(l => l.cabang === c && l.shift === 1 && l.ket === 'TELAT').length);
+    const d2 = Object.keys(CABANG).map(c => logs.filter(l => l.cabang === c && l.shift === 2 && l.ket === 'TELAT').length);
+    if(chart1) chart1.destroy(); if(chart2) chart2.destroy();
+    chart1 = new Chart(ctx1, {type:'bar', data:{labels, datasets:[{label:'Shift 1 Telat', data:d1, backgroundColor:'#ef4444'}]}, options:{maintainAspectRatio:false, plugins:{legend:{labels:{color:'#fff', font:{size:10}}}}}});
+    chart2 = new Chart(ctx2, {type:'bar', data:{labels, datasets:[{label:'Shift 2 Telat', data:d2, backgroundColor:'#f59e0b'}]}, options:{maintainAspectRatio:false, plugins:{legend:{labels:{color:'#fff', font:{size:10}}}}}});
+}
+
+window.openRekap = () => {
+    const b = parseInt(document.getElementById('fBulan').value), t = parseInt(document.getElementById('fTahun').value);
+    const filtered = logs.filter(l => l.dt.getMonth() === b && l.dt.getFullYear() === t);
+    const agg = {}; filtered.forEach(l => {
+        if(!agg[l.nama]) agg[l.nama] = {nama: l.nama, cab: l.cabang.split(' ')[0], abs: 0, tlt: 0};
+        agg[l.nama].abs++; if(l.ket==='TELAT') agg[l.nama].tlt++;
+    });
+    nav('previewOverlay'); 
+    document.getElementById('periodTitle').innerText = `REKAP ${b+1}/${t}`;
+    document.getElementById('rekapBody').innerHTML = '';
+    Object.values(agg).forEach(r => document.getElementById('rekapBody').innerHTML += `<tr><td class="font-bold text-white uppercase">${r.nama}</td><td>${r.cab}</td><td>${r.abs}</td><td>${r.tlt}</td></tr>`);
+};
+
+window.loginAdmin = () => { if(document.getElementById('pinAdmin').value==='setengah-4all') nav('dashboard'); else alert("SALAH"); };
+
 window.prosesLogin = async () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
-    if(!STAFF[id]) return alert("ID TIDAK VALID");
+    if(!STAFF[id]) return alert("ID SALAH");
     const snap = await get(ref(db, 'absensi'));
     if(snap.exists()){
         const bind = Object.values(snap.val()).find(l => l.idKaryawan === id);
@@ -156,22 +197,18 @@ window.validateSecurity = async (btn, cab, n) => {
     const today = new Date().toLocaleDateString('id-ID');
     const snap = await get(ref(db, 'absensi'));
     if(snap.exists() && Object.values(snap.val()).some(l => l.tanggal === today && l.idKaryawan === uData.id)){
-        alert("Sudah Absen Hari Ini!"); return location.reload();
+        alert("Sudah Absen!"); return location.reload();
     }
     navigator.geolocation.getCurrentPosition(pos => {
         const dist = getDistance(pos.coords.latitude, pos.coords.longitude, CABANG[cab].lat, CABANG[cab].lng);
-        if(dist > 0.5) { alert("Luar Radius 500m!"); return location.reload(); }
-        
-        // POP EFFECT & BLINK
+        if(dist > 0.5) { alert("Luar 500m!"); return location.reload(); }
         document.querySelectorAll('.btn-shift-item').forEach(b => b.classList.remove('btn-active-pop'));
         btn.classList.add('btn-active-pop');
-        
         document.getElementById('nameConfirm').innerText = uData.nama;
-        document.getElementById('locStatus').innerHTML = `✅ LOKASI AMAN: ${cab} (${(dist*1000).toFixed(0)}m)`;
-        document.getElementById('locStatus').className = "text-green-400 font-bold text-[10px] mt-2 tracking-widest";
+        document.getElementById('locStatus').innerText = `✅ LOKASI AMAN: ${cab} (${(dist*1000).toFixed(0)}m)`;
         window.pending = {c, n, lat: pos.coords.latitude, lng: pos.coords.longitude};
         document.getElementById('finalAction').classList.remove('hidden');
-    }, () => { alert("GPS WAJIB AKTIF!"); location.reload(); }, {enableHighAccuracy: true});
+    }, () => { alert("GPS OFF!"); location.reload(); }, {enableHighAccuracy: true});
 };
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -183,19 +220,17 @@ function getDistance(lat1, lon1, lat2, lon2) {
 document.getElementById('sendBtn').onclick = () => {
     const {c,n,lat,lng} = window.pending; const now = new Date(); const lim = CABANG[c]['s'+n];
     const st = (now.getHours() > lim || (now.getHours() === lim && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
-    set(push(ref(db, 'absensi')), { 
-        idKaryawan: uData.id, nama: uData.nama, cabang: c, shift: n, tanggal: now.toLocaleDateString('id-ID'), 
-        waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}), 
-        ket: st, deviceId: DEVID, lat, lng, timestamp: serverTimestamp() 
-    }).then(() => { 
-        alert("ABSEN BERHASIL!"); 
-        location.reload(); // REFRESH OTOMATIS KE HOME
-    });
+    set(push(ref(db, 'absensi')), { idKaryawan: uData.id, nama: uData.nama, cabang: c, shift: n, tanggal: now.toLocaleDateString('id-ID'), waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}), ket: st, deviceId: DEVID, lat, lng, timestamp: serverTimestamp() }).then(() => { alert("ABSEN BERHASIL!"); location.reload(); });
 };
 
-window.loginAdmin = () => { if(document.getElementById('pinAdmin').value==='setengah-4all') nav('dashboard'); else alert("SALAH"); };
-function startSync() { onValue(ref(db, 'absensi'), snap => { renderTable(); }); }
-window.renderTable = () => { /* Logic render tabel admin seperti sebelumnya */ };
+const ms = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+ms.forEach((m, i) => document.getElementById('fBulan').innerHTML += `<option value="${i}">${m}</option>`);
+[2025, 2026].forEach(y => document.getElementById('fTahun').innerHTML += `<option value="${y}">${y}</option>`);
+document.getElementById('fBulan').value = new Date().getMonth();
+document.getElementById('fTahun').value = new Date().getFullYear();
+document.getElementById('selTgl').value = new Date().toISOString().split('T')[0];
+const sc = document.getElementById('selCab'); sc.innerHTML = '<option value="Semua">SEMUA CABANG</option>';
+Object.keys(CABANG).forEach(c => sc.innerHTML += `<option value="${c}">${c}</option>`);
 </script>
 </body>
 </html>
