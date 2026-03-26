@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Absensi Kopi Setengah-4 v75</title>
+  <title>Absensi Kopi Setengah-4 v77</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -12,20 +12,20 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { background-color: #0f172a; color: white; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; }
     .container-mobile { width: 100%; max-width: 450px; margin: 0 auto; padding: 15px; }
-    .card-v75 { background: #1e293b; border-radius: 20px; padding: 15px; border: 1px solid #334155; margin-bottom: 20px; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-    .field-v75 { background: #ffffff !important; color: #1e293b !important; width: 100%; border-radius: 12px; font-weight: 800; height: 40px; text-align: center; border: 2px solid #c29851; font-size: 11px; margin-bottom: 10px; text-transform: uppercase; }
+    .card-v77 { background: #1e293b; border-radius: 20px; padding: 15px; border: 1px solid #334155; margin-bottom: 20px; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+    .field-v77 { background: #ffffff !important; color: #1e293b !important; width: 100%; border-radius: 12px; font-weight: 800; height: 40px; text-align: center; border: 2px solid #c29851; font-size: 11px; margin-bottom: 10px; text-transform: uppercase; }
     .btn-full { width: 100%; display: flex; align-items: center; justify-content: center; border-radius: 14px; font-weight: 900; height: 55px; text-transform: uppercase; transition: 0.2s; }
     .btn-green { background: #22c55e; color: #000; box-shadow: 0 4px 0 #166534; }
     .btn-opt { background: #334155; border: 1px solid #475569; color: #f1f5f9; font-size: 10px; height: 45px; margin-bottom: 8px; }
-    .table-v75 { width: 100%; border-collapse: collapse; margin-top: 5px; }
-    .table-v75 th { padding: 8px 1px; color: #c29851; font-size: 7.5px; border-bottom: 2px solid #334155; text-align: center; text-transform: uppercase; }
-    .table-v75 td { padding: 10px 1px; font-size: 8.5px; border-bottom: 1px solid #334155; text-align: center; font-weight: 600; vertical-align: middle; }
-    .img-map-small { width: 25px; height: 25px; cursor: pointer; display: block; margin: 0 auto; }
+    .table-v77 { width: 100%; border-collapse: collapse; margin-top: 5px; }
+    .table-v77 th { padding: 8px 1px; color: #c29851; font-size: 7.5px; border-bottom: 2px solid #334155; text-align: center; text-transform: uppercase; }
+    .table-v77 td { padding: 10px 1px; font-size: 8.5px; border-bottom: 1px solid #334155; text-align: center; font-weight: 600; vertical-align: middle; }
+    .img-map-small { width: 22px; height: 22px; cursor: pointer; display: block; margin: 0 auto; }
     .lbl { padding: 2px 4px; border-radius: 4px; font-size: 7px; font-weight: 900; color: white; display: inline-block; }
     .lbl-sukses { background: #16a34a; }
     .lbl-telat { background: #dc2626; }
     .btn-pdf { position: absolute; bottom: 10px; right: 10px; background: #dc2626; color: white; padding: 5px 10px; border-radius: 8px; font-size: 8px; font-weight: 900; }
-    .section-title { text-[#c29851] font-black text-[9px] mb-3 uppercase pl-2 border-l-2 border-[#c29851]; }
+    .section-title { color: #c29851; font-weight: 900; font-size: 10px; text-transform: uppercase; border-left: 3px solid #c29851; padding-left: 8px; margin-bottom: 12px; }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -33,9 +33,9 @@
 
 <div class="container-mobile">
   <div id="home" class="text-center py-8">
-    <h1 class="text-2xl font-black italic text-[#c29851] mb-1 uppercase tracking-tighter">Kopi Setengah-4</h1>
+    <h1 class="text-2xl font-black italic text-[#c29851] mb-1 uppercase">Kopi Setengah-4</h1>
     <p id="clock" class="text-[10px] opacity-60 font-mono mb-8"></p>
-    <div class="card-v75">
+    <div class="card-v77">
       <button onclick="nav('karyawan')" class="btn-full btn-green"><i class="fa fa-location-dot mr-3 text-xl"></i> ABSEN SEKARANG</button>
       <button onclick="nav('admin')" class="btn-full btn-opt !mt-6 !h-[40px] opacity-70">ADMIN LOGIN</button>
     </div>
@@ -43,40 +43,40 @@
 
   <div id="karyawan" class="hidden">
     <button onclick="nav('home')" class="mb-4 text-slate-400 font-black text-[10px] uppercase"><i class="fa fa-arrow-left mr-2"></i> Kembali</button>
-    <div class="card-v75"><div id="listCabang"></div><div id="listShift"></div><div id="gpsStatus" class="text-[9px] text-center mt-3 font-bold opacity-80 hidden"></div></div>
+    <div class="card-v77"><div id="listCabang"></div><div id="listShift"></div><div id="gpsStatus" class="text-[9px] text-center mt-3 font-bold opacity-80 hidden"></div></div>
   </div>
 
   <div id="dashboard" class="hidden space-y-4 pb-20">
     <div class="flex justify-between items-center px-1">
-      <span class="font-black text-[#c29851] text-[10px] uppercase">Laporan Admin</span>
+      <span class="font-black text-[#c29851] text-[10px] uppercase">Laporan Admin v77</span>
       <button onclick="nav('home')" class="text-red-500 font-black text-[9px] uppercase">Logout</button>
     </div>
 
-    <div class="card-v75 !p-2">
+    <div class="card-v77 !p-3">
       <h2 class="section-title">Laporan Harian</h2>
       <div class="flex gap-1 mb-3">
-        <select id="selCab" onchange="renderAll()" class="field-v75 !h-[30px] !mb-0 !text-[8px] flex-1"></select>
-        <input type="date" id="selTgl" onchange="renderAll()" class="field-v75 !h-[30px] !mb-0 !text-[8px] flex-1">
+        <select id="selCab" onchange="renderAll()" class="field-v77 !h-[30px] !mb-0 !text-[8px] flex-1"></select>
+        <input type="date" id="selTgl" onchange="renderAll()" class="field-v77 !h-[30px] !mb-0 !text-[8px] flex-1">
       </div>
-      <table id="tableHarian" class="table-v75">
+      <table id="tableHarian" class="table-v77">
         <thead><tr><th>NAMA</th><th>CABANG</th><th>TGL</th><th>MAPS</th><th>JAM</th><th>STS</th></tr></thead>
         <tbody id="tBodyHarian"></tbody>
       </table>
       <button onclick="exportPDF('Harian', 'tableHarian')" class="btn-pdf">PDF</button>
     </div>
 
-    <div class="card-v75 !p-2">
-      <h2 class="section-title">Rekap Mingguan (7 Hari)</h2>
-      <table id="tableMingguan" class="table-v75">
+    <div class="card-v77 !p-3">
+      <h2 class="section-title">Rekap Mingguan (7 Hari Terakhir)</h2>
+      <table id="tableMingguan" class="table-v77">
         <thead><tr><th>CABANG</th><th>TOTAL</th><th>TEPAT</th><th>TELAT</th></tr></thead>
         <tbody id="tBodyMingguan"></tbody>
       </table>
       <button onclick="exportPDF('Mingguan', 'tableMingguan')" class="btn-pdf">PDF</button>
     </div>
 
-    <div class="card-v75 !p-2">
-      <h2 class="section-title">Rekap Bulanan (30 Hari)</h2>
-      <table id="tableBulanan" class="table-v75">
+    <div class="card-v77 !p-3">
+      <h2 class="section-title">Rekap Bulanan (30 Hari Terakhir)</h2>
+      <table id="tableBulanan" class="table-v77">
         <thead><tr><th>CABANG</th><th>TOTAL</th><th>TEPAT</th><th>TELAT</th></tr></thead>
         <tbody id="tBodyBulanan"></tbody>
       </table>
@@ -86,7 +86,7 @@
 
   <div id="admin" class="hidden">
     <button onclick="nav('home')" class="mb-4 text-slate-400 font-black text-[10px] uppercase"><i class="fa fa-arrow-left mr-2"></i> Kembali</button>
-    <div class="card-v75"><input id="passAdmin" type="password" placeholder="PASSWORD" class="field-v75"><button onclick="login()" class="btn-full btn-green !h-[45px]">MASUK</button></div>
+    <div class="card-v77"><input id="passAdmin" type="password" placeholder="PASSWORD" class="field-v77"><button onclick="login()" class="btn-full btn-green !h-[45px]">MASUK</button></div>
   </div>
 </div>
 
@@ -133,15 +133,20 @@ window.buildShift = (name) => {
 };
 
 window.showForm = (c, sh) => {
-  document.getElementById('listShift').innerHTML = `<input id="namaK" placeholder="NAMA" class="field-v75" autofocus><button onclick="simpan('${c}',${sh})" id="btnS" class="btn-full btn-green">KIRIM</button>`;
+  document.getElementById('listShift').innerHTML = `<input id="namaK" placeholder="NAMA" class="field-v77" autofocus><button onclick="simpan('${c}',${sh})" id="btnS" class="btn-full btn-green">KIRIM</button>`;
 };
 
 window.simpan = async (c, sh) => {
   const n = document.getElementById('namaK').value.trim(); if(!n) return;
-  const now = new Date();
-  const status = (now.getHours() > aturan[c]['s'+sh] || (now.getHours() === aturan[c]['s'+sh] && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
-  await set(push(ref(db, 'absensi')), { nama: n.toUpperCase(), cabang: c, shift: sh, tanggal: now.toLocaleDateString('id-ID'), waktu: now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), ket: status, lat: userLat, lng: userLng, timestamp: serverTimestamp() });
-  alert("BERHASIL!"); nav('home');
+  const now = new Date(); const tgl = now.toLocaleDateString('id-ID');
+  onValue(ref(db, 'absensi'), async (snap) => {
+    let exist = false;
+    if(snap.val()) { Object.values(snap.val()).forEach(d => { if(d.tanggal === tgl && d.nama.toLowerCase() === n.toLowerCase()) exist = true; }); }
+    if(exist) { alert("SUDAH ABSEN HARI INI!"); nav('home'); return; }
+    const status = (now.getHours() > aturan[c]['s'+sh] || (now.getHours() === aturan[c]['s'+sh] && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
+    await set(push(ref(db, 'absensi')), { nama: n.toUpperCase(), cabang: c, shift: sh, tanggal: tgl, waktu: now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}), ket: status, lat: userLat, lng: userLng, timestamp: serverTimestamp() });
+    alert("BERHASIL!"); nav('home');
+  }, { onlyOnce: true });
 };
 
 function startSync() {
@@ -184,7 +189,7 @@ window.exportPDF = (title, tableId) => {
     const { jsPDF } = window.jspdf; const doc = new jsPDF('p', 'mm', 'a4');
     doc.text(`LAPORAN ${title.toUpperCase()}`, 14, 15);
     doc.autoTable({ html: `#${tableId}`, startY: 25, theme: 'grid', styles: { fontSize: 8, halign: 'center' } });
-    doc.save(`Laporan_${title}.pdf`);
+    doc.save(`Absensi_${title}.pdf`);
 };
 
 window.login = () => { if(document.getElementById('passAdmin').value === 'setengah-4all') nav('dashboard'); else alert("SALAH!"); };
