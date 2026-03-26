@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v137 - Shift Lock System</title>
+  <title>Kopi Setengah-4 v138 - Branch Separated Report</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -31,13 +31,12 @@
     .pro-table td { font-size: 8px; padding: 12px 1px; border-bottom: 1px solid var(--border); text-align: center; color: #cbd5e1; vertical-align: middle; }
     .hidden { display: none !important; }
 
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; background: #16a34a; } }
-    .btn-active-shift { animation: blink 0.8s infinite; border: 2px solid #fff !important; background: #16a34a !important; color: white !important; }
-
     #reportOverlay { background: #f1f5f9; position: fixed; inset: 0; z-index: 2000; padding: 20px; overflow-y: auto; color: #1e293b; }
-    .white-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
-    .white-table th { background: #1e293b; color: white; padding: 12px; font-size: 10px; text-align: center; }
-    .white-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 11px; text-align: center; color: #334155; }
+    .branch-section { background: white; border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
+    .branch-title { font-size: 14px; font-weight: 800; color: #1e293b; border-bottom: 2px solid #c29851; padding-bottom: 5px; margin-bottom: 12px; display: inline-block; }
+    .white-table { width: 100%; border-collapse: collapse; }
+    .white-table th { background: #f8fafc; color: #64748b; padding: 10px; font-size: 9px; text-align: center; border-bottom: 1px solid #e2e8f0; }
+    .white-table td { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 11px; text-align: center; color: #1e293b; }
   </style>
 </head>
 <body>
@@ -118,18 +117,15 @@
 
   <div id="reportOverlay" class="hidden">
     <div class="flex justify-between items-center mb-6">
-        <button onclick="nav('dashboard')" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase">← Tutup</button>
-        <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase">Download PDF</button>
+        <button onclick="nav('dashboard')" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-[10px] font-bold">← TUTUP</button>
+        <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold">DOWNLOAD PDF</button>
     </div>
-    <div id="pdfContent" class="bg-white p-6 rounded-lg shadow-sm">
-        <div class="text-center mb-6">
-            <h2 class="text-2xl font-black text-slate-900 uppercase italic">KOPI SETENGAH-4</h2>
+    <div id="pdfContent">
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-black text-slate-900 italic">KOPI SETENGAH-4</h2>
             <p id="reportTitle" class="text-[12px] font-bold text-slate-500 uppercase mt-1"></p>
         </div>
-        <table class="white-table" id="tablePro">
-            <thead><tr><th>NAMA KARYAWAN</th><th>CABANG</th><th>HADIR</th><th>TELAT</th></tr></thead>
-            <tbody id="reportTableBody"></tbody>
-        </table>
+        <div id="branchTablesContainer"></div>
     </div>
   </div>
 </div>
@@ -145,16 +141,16 @@ const db = getDatabase(app);
 const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin" };
 const CABANG = { "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9} };
 
-const singkatan = (name) => {
-    if(name === "Tanjung Duren") return "Tandur";
-    if(name === "Cempaka Putih") return "Cemput";
-    if(name === "Pondok Indah") return "P.Indah";
-    if(name === "Kebon Jeruk") return "Jl.Panjang";
-    return name;
+const singkatan = (n) => {
+    if(n === "Tanjung Duren") return "Tandur";
+    if(n === "Cempaka Putih") return "Cemput";
+    if(n === "Pondok Indah") return "P.Indah";
+    if(n === "Kebon Jeruk") return "Jl.Panjang";
+    return n;
 };
 
 const DEVID = localStorage.getItem('ks4_devid') || localStorage.setItem('ks4_devid', 'DEV-'+Math.random().toString(36).substr(2,9).toUpperCase()) || localStorage.getItem('ks4_devid');
-let logs = []; let uData = null; window.pnd = null; let currentReportData = [];
+let logs = []; let uData = null; window.pnd = null; let groupedData = {};
 
 window.nav = (id) => {
     document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden'));
@@ -188,24 +184,16 @@ window.selS = (btn, cab, n) => {
 };
 
 document.getElementById('sendBtn').onclick = async () => {
-    const {cab, n} = window.pnd; 
-    const today = new Date().toLocaleDateString('id-ID');
-    
-    // --- START TRIPLE LOCK LOGIC ---
+    const {cab, n} = window.pnd; const today = new Date().toLocaleDateString('id-ID');
     const snapAll = await get(ref(db, 'absensi'));
-    let idLock = false; let shiftLock = false;
-    
+    let idL = false; let shL = false;
     if (snapAll.exists()) {
-        const allData = Object.values(snapAll.val());
-        // 1. Lock ID Karyawan (1x per hari)
-        idLock = allData.some(e => e.idKaryawan === uData.id && e.tanggal === today);
-        // 2. Lock Shift Per Cabang (1x per hari)
-        shiftLock = allData.some(e => e.cabang === cab && e.shift === n && e.tanggal === today);
+        const ad = Object.values(snapAll.val());
+        idL = ad.some(e => e.idKaryawan === uData.id && e.tanggal === today);
+        shL = ad.some(e => e.cabang === cab && e.shift === n && e.tanggal === today);
     }
-
-    if (idLock) return alert("ANDA SUDAH ABSEN HARI INI!");
-    if (shiftLock) return alert(`SHIFT ${n} DI ${singkatan(cab).toUpperCase()} SUDAH TERISI!`);
-    // --- END TRIPLE LOCK LOGIC ---
+    if (idL) return alert("SUDAH ABSEN!");
+    if (shL) return alert("SHIFT TERISI!");
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
         const dist = getDistance(pos.coords.latitude, pos.coords.longitude, CABANG[cab].lat, CABANG[cab].lng);
@@ -218,8 +206,8 @@ document.getElementById('sendBtn').onclick = async () => {
 };
 
 function getDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180;
-    const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+    const R = 6371; const dL = (lat2-lat1)*Math.PI/180; const dLo = (lon2-lon1)*Math.PI/180;
+    const a = Math.sin(dL/2)*Math.sin(dL/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLo/2)*Math.sin(dLo/2);
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
@@ -231,39 +219,60 @@ function startSync() {
         renderAll();
     });
     onValue(ref(db, 'locks'), (snap) => {
-        const bdy = document.getElementById('tBodyDevice'); bdy.innerHTML = '';
+        const b = document.getElementById('tBodyDevice'); b.innerHTML = '';
         if(snap.exists()) Object.entries(snap.val()).forEach(([id, dev]) => {
-            bdy.innerHTML += `<tr><td class="font-bold text-white uppercase">${STAFF[id] || id}</td><td>${dev.substring(0,8)}</td><td><button onclick="resetD('${id}')" class="bg-red-600 px-2 py-1 rounded text-[8px] font-black uppercase">Reset</button></td></tr>`;
+            b.innerHTML += `<tr><td class="font-bold text-white uppercase">${STAFF[id] || id}</td><td>${dev.substring(0,8)}</td><td><button onclick="resetD('${id}')" class="bg-red-600 px-2 py-1 rounded text-[8px] font-black uppercase">Reset</button></td></tr>`;
         });
     });
 }
 
-window.resetD = async (id) => { if(confirm("Reset device?")) await remove(ref(db, `locks/${id}`)); };
+window.resetD = async (id) => { if(confirm("Reset?")) await remove(ref(db, `locks/${id}`)); };
 
 window.renderAll = () => {
-    const bdy = document.getElementById('tBodyHarian');
-    const tgl = document.getElementById('selTgl').value || new Date().toLocaleDateString('en-CA');
-    const target = new Date(tgl).toLocaleDateString('id-ID');
-    const cabFilter = document.getElementById('selCab').value;
-    bdy.innerHTML = '';
-    logs.filter(l => l.tanggal === target && (cabFilter==='Semua' || l.cabang===cabFilter)).forEach(l => {
-        bdy.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}</td><td class="text-gold font-bold">${singkatan(l.cabang)}</td><td>${l.waktu}</td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td><td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
+    const b = document.getElementById('tBodyHarian');
+    const t = document.getElementById('selTgl').value || new Date().toLocaleDateString('en-CA');
+    const target = new Date(t).toLocaleDateString('id-ID');
+    const cf = document.getElementById('selCab').value;
+    b.innerHTML = '';
+    logs.filter(l => l.tanggal === target && (cf==='Semua' || l.cabang===cf)).forEach(l => {
+        b.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}</td><td class="text-gold font-bold">${singkatan(l.cabang)}</td><td>${l.waktu}</td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td><td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
     });
 };
 
+// LOGIKA LAPORAN TERPISAH PER CABANG
 window.generateReport = () => {
-    const b = parseInt(document.getElementById('fBulan').value);
-    const t = parseInt(document.getElementById('fTahun').value);
-    const agg = {};
-    logs.filter(l => l.dt.getMonth() === b && l.dt.getFullYear() === t).forEach(l => {
-        if(!agg[l.nama]) agg[l.nama] = {nama: l.nama, cab: l.cabang, abs: 0, tlt: 0};
-        agg[l.nama].abs++; if(l.ket==='TELAT') agg[l.nama].tlt++;
+    const bln = parseInt(document.getElementById('fBulan').value);
+    const thn = parseInt(document.getElementById('fTahun').value);
+    const ms = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+    
+    groupedData = {};
+    logs.filter(l => l.dt.getMonth() === bln && l.dt.getFullYear() === thn).forEach(l => {
+        if(!groupedData[l.cabang]) groupedData[l.cabang] = {};
+        if(!groupedData[l.cabang][l.nama]) groupedData[l.cabang][l.nama] = {nama: l.nama, abs: 0, tlt: 0};
+        groupedData[l.cabang][l.nama].abs++; if(l.ket==='TELAT') groupedData[l.cabang][l.nama].tlt++;
     });
-    currentReportData = Object.values(agg);
-    const bName = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"][b];
-    document.getElementById('reportTitle').innerText = `Laporan Kehadiran ${bName} ${t}`;
-    const bdy = document.getElementById('reportTableBody'); bdy.innerHTML = '';
-    currentReportData.forEach(r => { bdy.innerHTML += `<tr><td class="font-bold text-left pl-6 uppercase">${r.nama}</td><td>${singkatan(r.cab)}</td><td>${r.abs}</td><td class="text-red-600 font-black">${r.tlt}</td></tr>`; });
+
+    document.getElementById('reportTitle').innerText = `Laporan Kehadiran ${ms[bln]} ${thn}`;
+    const container = document.getElementById('branchTablesContainer');
+    container.innerHTML = '';
+
+    if(Object.keys(groupedData).length === 0) {
+        container.innerHTML = '<p class="text-center text-slate-400 py-10">Tidak ada data pada periode ini.</p>';
+    } else {
+        Object.keys(groupedData).sort().forEach(cabName => {
+            let html = `
+            <div class="branch-section">
+                <div class="branch-title">${cabName.toUpperCase()}</div>
+                <table class="white-table">
+                    <thead><tr><th class="text-left">NAMA</th><th>HADIR</th><th>TELAT</th></tr></thead>
+                    <tbody>`;
+            Object.values(groupedData[cabName]).forEach(r => {
+                html += `<tr><td class="text-left font-bold uppercase">${r.nama}</td><td>${r.abs}</td><td class="text-red-600 font-bold">${r.tlt}</td></tr>`;
+            });
+            html += `</tbody></table></div>`;
+            container.innerHTML += html;
+        });
+    }
     nav('reportOverlay');
 };
 
@@ -272,12 +281,20 @@ window.downloadPDF = () => {
     const title = document.getElementById('reportTitle').innerText;
     doc.setFontSize(18); doc.text("KOPI SETENGAH-4", 105, 20, {align: 'center'});
     doc.setFontSize(11); doc.text(title, 105, 28, {align: 'center'});
-    const rows = currentReportData.map(r => [r.nama, singkatan(r.cab), r.abs, r.tlt]);
-    doc.autoTable({ startY: 35, head: [['NAMA KARYAWAN', 'CABANG', 'HADIR', 'TELAT']], body: rows, theme: 'grid' });
+    
+    let y = 40;
+    Object.keys(groupedData).sort().forEach(cab => {
+        doc.setFontSize(12); doc.setTextColor(194, 152, 81);
+        doc.text(cab.toUpperCase(), 14, y);
+        y += 5;
+        const rows = Object.values(groupedData[cab]).map(r => [r.nama, r.abs, r.tlt]);
+        doc.autoTable({ startY: y, head: [['NAMA KARYAWAN', 'TOTAL HADIR', 'TOTAL TELAT']], body: rows, theme: 'grid', headStyles: {fillColor: [30, 41, 59]} });
+        y = doc.lastAutoTable.finalY + 15;
+        if(y > 250) { doc.addPage(); y = 20; }
+    });
     doc.save(`Laporan_${title.replace(/ /g,'_')}.pdf`);
 };
 
-// INITIALIZE
 const ms = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 ms.forEach((m, i) => document.getElementById('fBulan').innerHTML += `<option value="${i}">${m}</option>`);
 [2025, 2026].forEach(y => document.getElementById('fTahun').innerHTML += `<option value="${y}">${y}</option>`);
