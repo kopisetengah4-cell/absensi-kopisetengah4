@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v133 - System Fixed</title>
+  <title>Kopi Setengah-4 v135 - Custom Abbreviation</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -28,15 +28,15 @@
     
     .table-wrapper { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #0f172a; }
     .pro-table { width: 100%; table-layout: fixed; border-collapse: collapse; }
-    .pro-table th { background: #1e293b; color: var(--gold); font-size: 7px; padding: 12px 2px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
-    .pro-table td { font-size: 8.5px; padding: 12px 2px; border-bottom: 1px solid var(--border); text-align: center; color: #cbd5e1; }
+    .pro-table th { background: #1e293b; color: var(--gold); font-size: 7px; padding: 12px 1px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
+    .pro-table td { font-size: 8px; padding: 12px 1px; border-bottom: 1px solid var(--border); text-align: center; color: #cbd5e1; vertical-align: middle; }
     .hidden { display: none !important; }
 
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; background: #16a34a; } }
     .btn-active-shift { animation: blink 0.8s infinite; border: 2px solid #fff !important; background: #16a34a !important; color: white !important; }
 
     #reportOverlay { background: #f1f5f9; position: fixed; inset: 0; z-index: 2000; padding: 20px; overflow-y: auto; color: #1e293b; }
-    .white-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .white-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
     .white-table th { background: #1e293b; color: white; padding: 12px; font-size: 10px; text-align: center; }
     .white-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 11px; text-align: center; color: #334155; }
   </style>
@@ -97,13 +97,22 @@
     </div>
 
     <div class="glass-card !p-2">
+      <p class="text-[10px] text-gold font-bold mb-3 uppercase text-center">Monitoring Harian</p>
       <div class="grid grid-cols-2 gap-2 mb-3">
         <select id="selCab" onchange="renderAll()" class="input-pro !h-[38px]"></select>
         <input type="date" id="selTgl" onchange="renderAll()" class="input-pro !h-[38px]">
       </div>
       <div class="table-wrapper">
         <table class="pro-table">
-            <thead><tr><th style="width:30%">NAMA</th><th style="width:25%">WAKTU</th><th style="width:15%">LOC</th><th style="width:30%">KET</th></tr></thead>
+            <thead>
+                <tr>
+                    <th style="width:28%">NAMA</th>
+                    <th style="width:22%">CABANG</th>
+                    <th style="width:18%">WAKTU</th>
+                    <th style="width:12%">LOC</th>
+                    <th style="width:20%">KET</th>
+                </tr>
+            </thead>
             <tbody id="tBodyHarian"></tbody>
         </table>
       </div>
@@ -123,9 +132,9 @@
   <div id="reportOverlay" class="hidden">
     <div class="flex justify-between items-center mb-6">
         <button onclick="nav('dashboard')" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase">← Tutup</button>
-        <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase shadow-lg"><i class="fas fa-download mr-2"></i> Download PDF</button>
+        <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase shadow-lg">Download PDF</button>
     </div>
-    <div id="pdfContent" class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+    <div id="pdfContent" class="bg-white p-6 rounded-lg shadow-sm">
         <div class="text-center mb-6">
             <h2 class="text-2xl font-black text-slate-900 uppercase italic">KOPI SETENGAH-4</h2>
             <p id="reportTitle" class="text-[12px] font-bold text-slate-500 uppercase mt-1"></p>
@@ -149,6 +158,15 @@ const db = getDatabase(app);
 const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin" };
 const CABANG = { "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9} };
 
+// FUNGSI SINGKATAN CABANG
+const singkatan = (name) => {
+    if(name === "Tanjung Duren") return "Tandur";
+    if(name === "Cempaka Putih") return "Cemput";
+    if(name === "Pondok Indah") return "P.Indah";
+    if(name === "Kebon Jeruk") return "Jl.Panjang";
+    return name;
+};
+
 const DEVID = localStorage.getItem('ks4_devid') || localStorage.setItem('ks4_devid', 'DEV-'+Math.random().toString(36).substr(2,9).toUpperCase()) || localStorage.getItem('ks4_devid');
 let logs = []; let uData = null; window.pnd = null; let currentReportData = [];
 
@@ -158,7 +176,6 @@ window.nav = (id) => {
     if(id==='dashboard') startSync();
 };
 
-// FIX: LOGIN KARYAWAN FUNCTION
 window.prosesLogin = async () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
     if(!STAFF[id]) return alert("ID SALAH!");
@@ -170,11 +187,9 @@ window.prosesLogin = async () => {
     Object.keys(CABANG).forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
 };
 
-// FIX: SHIFT SELECTION FUNCTIONS
 window.updateShiftUI = () => {
     const c = document.getElementById('selCabAbsen').value;
-    const g = document.getElementById('shiftGrid'); g.innerHTML = ''; window.pnd = null;
-    document.getElementById('sendBtn').disabled = true; document.getElementById('sendBtn').classList.add('opacity-50');
+    const g = document.getElementById('shiftGrid'); g.innerHTML = '';
     if(!c) return;
     const ss = CABANG[c].s2 ? [1,2] : [1];
     ss.forEach(n => g.innerHTML += `<button onclick="selS(this, '${c}', ${n})" class="btn-pro btn-dark btn-shift-item">SHIFT ${n}</button>`);
@@ -194,8 +209,8 @@ document.getElementById('sendBtn').onclick = async () => {
         const now = new Date(); const st = (now.getHours() > CABANG[cab]['s'+n] || (now.getHours() === CABANG[cab]['s'+n] && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
         await set(ref(db, `locks/${uData.id}`), DEVID);
         await set(push(ref(db, 'absensi')), { idKaryawan: uData.id, nama: uData.nama, cabang: cab, shift: n, tanggal: today, waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}), ket: st, lat: pos.coords.latitude, lng: pos.coords.longitude, timestamp: serverTimestamp() });
-        alert("ABSEN BERHASIL!"); location.reload();
-    }, () => alert("AKTIFKAN GPS!"), {enableHighAccuracy: true});
+        alert("BERHASIL!"); location.reload();
+    }, () => alert("GPS OFF"), {enableHighAccuracy: true});
 };
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -204,7 +219,6 @@ function getDistance(lat1, lon1, lat2, lon2) {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-// ADMIN DASHBOARD
 window.loginAdmin = () => { if(document.getElementById('pinAdmin').value==='setengah-4all') nav('dashboard'); else alert("SALAH"); };
 
 function startSync() {
@@ -222,6 +236,25 @@ function startSync() {
 
 window.resetD = async (id) => { if(confirm("Reset device?")) await remove(ref(db, `locks/${id}`)); };
 
+// RENDER TABEL HARIAN DENGAN SINGKATAN
+window.renderAll = () => {
+    const bdy = document.getElementById('tBodyHarian');
+    const tgl = document.getElementById('selTgl').value || new Date().toLocaleDateString('en-CA');
+    const target = new Date(tgl).toLocaleDateString('id-ID');
+    const cabFilter = document.getElementById('selCab').value;
+    bdy.innerHTML = '';
+    logs.filter(l => l.tanggal === target && (cabFilter==='Semua' || l.cabang===cabFilter)).forEach(l => {
+        bdy.innerHTML += `
+        <tr>
+            <td class="font-bold text-white uppercase">${l.nama}</td>
+            <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
+            <td>${l.waktu}</td>
+            <td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td>
+            <td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td>
+        </tr>`;
+    });
+};
+
 window.generateReport = () => {
     const b = parseInt(document.getElementById('fBulan').value);
     const t = parseInt(document.getElementById('fTahun').value);
@@ -234,7 +267,7 @@ window.generateReport = () => {
     const bName = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"][b];
     document.getElementById('reportTitle').innerText = `Laporan Kehadiran ${bName} ${t}`;
     const bdy = document.getElementById('reportTableBody'); bdy.innerHTML = '';
-    currentReportData.forEach(r => { bdy.innerHTML += `<tr><td class="font-bold uppercase text-left pl-6">${r.nama}</td><td>${r.cab}</td><td>${r.abs}</td><td class="font-black text-red-600">${r.tlt}</td></tr>`; });
+    currentReportData.forEach(r => { bdy.innerHTML += `<tr><td class="font-bold text-left pl-6 uppercase">${r.nama}</td><td>${singkatan(r.cab)}</td><td>${r.abs}</td><td class="text-red-600 font-black">${r.tlt}</td></tr>`; });
     nav('reportOverlay');
 };
 
@@ -243,31 +276,18 @@ window.downloadPDF = () => {
     const title = document.getElementById('reportTitle').innerText;
     doc.setFontSize(18); doc.text("KOPI SETENGAH-4", 105, 20, {align: 'center'});
     doc.setFontSize(11); doc.text(title, 105, 28, {align: 'center'});
-    const rows = currentReportData.map(r => [r.nama, r.cab, r.abs, r.tlt]);
-    doc.autoTable({ startY: 35, head: [['NAMA KARYAWAN', 'CABANG', 'TOTAL HADIR', 'TOTAL TELAT']], body: rows, theme: 'grid', headStyles: { fillColor: [30, 41, 59] }});
+    const rows = currentReportData.map(r => [r.nama, singkatan(r.cab), r.abs, r.tlt]);
+    doc.autoTable({ startY: 35, head: [['NAMA KARYAWAN', 'CABANG', 'HADIR', 'TELAT']], body: rows, theme: 'grid' });
     doc.save(`Laporan_${title.replace(/ /g,'_')}.pdf`);
 };
 
-window.renderAll = () => {
-    const bdy = document.getElementById('tBodyHarian');
-    const tgl = document.getElementById('selTgl').value || new Date().toLocaleDateString('en-CA');
-    const target = new Date(tgl).toLocaleDateString('id-ID');
-    const cab = document.getElementById('selCab').value;
-    bdy.innerHTML = '';
-    logs.filter(l => l.tanggal === target && (cab==='Semua' || l.cabang===cab)).forEach(l => {
-        bdy.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}</td><td>${l.waktu}</td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td><td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
-    });
-};
-
-// INITIALIZE
 const ms = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 ms.forEach((m, i) => document.getElementById('fBulan').innerHTML += `<option value="${i}">${m}</option>`);
 [2025, 2026].forEach(y => document.getElementById('fTahun').innerHTML += `<option value="${y}">${y}</option>`);
 document.getElementById('fBulan').value = new Date().getMonth();
-document.getElementById('fTahun').value = new Date().getFullYear();
 document.getElementById('selTgl').value = new Date().toLocaleDateString('en-CA');
 const sc = document.getElementById('selCab'); sc.innerHTML = '<option value="Semua">SEMUA CABANG</option>';
 Object.keys(CABANG).forEach(c => sc.innerHTML += `<option value="${c}">${c}</option>`);
 </script>
 </body>
-</html>
+  </html>
