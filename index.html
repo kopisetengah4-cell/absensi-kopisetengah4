@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v130 - Full Master Admin</title>
+  <title>Kopi Setengah-4 v133 - System Fixed</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,13 +16,12 @@
     :root { --gold: #c29851; --dark-bg: #0f172a; --card-bg: #1e293b; --border: #334155; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background-color: var(--dark-bg); color: #f8fafc; margin: 0; overflow-x: hidden; width: 100vw; }
-    .main-container { width: 94%; margin: 0 auto; padding: 15px 0; }
-    .glass-card { background: var(--card-bg); border-radius: 16px; padding: 18px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .main-container { width: 94%; margin: 0 auto; padding: 15px 0; position: relative; }
     
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; background: #16a34a; } }
-    .btn-active-shift { animation: blink 0.8s infinite; border: 2px solid #fff !important; background: #16a34a !important; color: white !important; }
-
-    .btn-pro { width: 100%; height: 52px; border-radius: 12px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; justify-content: center; font-size: 13px; border: none; transition: 0.2s; }
+    .btn-back-global { position: absolute; top: 0; left: 0; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: flex; align-items: center; gap: 5px; padding: 5px 0; z-index: 50; }
+    .glass-card { background: var(--card-bg); border-radius: 16px; padding: 18px; border: 1px solid var(--border); margin-bottom: 20px; }
+    
+    .btn-pro { width: 100%; height: 52px; border-radius: 12px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; justify-content: center; font-size: 13px; border: none; }
     .btn-gold { background: var(--gold); color: #000; box-shadow: 0 4px 0 #8e6d35; }
     .btn-dark { background: #334155; color: #cbd5e1; border: 1px solid #475569; }
     .input-pro { background: #fff !important; color: #000 !important; width: 100%; border-radius: 10px; font-weight: 700; height: 44px; text-align: center; border: 2px solid var(--gold); outline: none; font-size: 12px; }
@@ -32,84 +31,110 @@
     .pro-table th { background: #1e293b; color: var(--gold); font-size: 7px; padding: 12px 2px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
     .pro-table td { font-size: 8.5px; padding: 12px 2px; border-bottom: 1px solid var(--border); text-align: center; color: #cbd5e1; }
     .hidden { display: none !important; }
-    #previewOverlay { background: var(--dark-bg); position: fixed; inset: 0; z-index: 2000; padding: 15px; overflow-y: auto; }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; background: #16a34a; } }
+    .btn-active-shift { animation: blink 0.8s infinite; border: 2px solid #fff !important; background: #16a34a !important; color: white !important; }
+
+    #reportOverlay { background: #f1f5f9; position: fixed; inset: 0; z-index: 2000; padding: 20px; overflow-y: auto; color: #1e293b; }
+    .white-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .white-table th { background: #1e293b; color: white; padding: 12px; font-size: 10px; text-align: center; }
+    .white-table td { padding: 12px; border-bottom: 1px solid #e2e8f0; font-size: 11px; text-align: center; color: #334155; }
   </style>
 </head>
 <body>
 
 <div class="main-container">
-  <div id="home" class="py-20 text-center">
-    <h1 class="text-4xl font-black text-[#c29851] italic mb-12 uppercase tracking-tighter">Kopi Setengah-4</h1>
+  <div id="home" class="py-24 text-center">
+    <h1 class="text-4xl font-black text-[#c29851] italic mb-12 uppercase">Kopi Setengah-4</h1>
     <div class="glass-card">
-        <button onclick="nav('karyawan')" class="btn-pro btn-gold mb-4"><i class="fas fa-fingerprint mr-3"></i> ABSEN MASUK</button>
-        <button onclick="nav('admin')" class="btn-pro btn-dark"><i class="fas fa-user-shield mr-3"></i> PANEL ADMIN</button>
+        <button onclick="nav('karyawan')" class="btn-pro btn-gold mb-4">ABSEN MASUK</button>
+        <button onclick="nav('admin')" class="btn-pro btn-dark">PANEL ADMIN</button>
     </div>
   </div>
 
-  <div id="formAbsen" class="hidden">
+  <div id="karyawan" class="hidden pt-10">
+    <button onclick="nav('home')" class="btn-back-global">← Kembali</button>
+    <div class="glass-card">
+        <p class="text-[10px] text-gold font-bold mb-4 text-center uppercase">Login Karyawan</p>
+        <input id="inputID" placeholder="ID (KS4-XXXX)" class="input-pro">
+        <button onclick="prosesLogin()" class="btn-pro btn-gold mt-4">MASUK</button>
+    </div>
+  </div>
+
+  <div id="formAbsen" class="hidden pt-10">
+    <button onclick="nav('home')" class="btn-back-global">← Keluar</button>
     <div class="glass-card text-center">
         <h2 id="nameGreeting" class="text-xl font-black text-white uppercase mb-4"></h2>
-        <select id="selCabAbsen" class="input-pro mb-6" onchange="updateShiftUI()"><option value="">-- PILIH CABANG --</option></select>
+        <select id="selCabAbsen" class="input-pro mb-6" onchange="updateShiftUI()"><option value="">-- CABANG --</option></select>
         <div id="shiftGrid" class="grid grid-cols-1 gap-4 mb-8"></div>
         <div class="border-t border-slate-700 pt-6">
-            <button id="sendBtn" class="btn-pro !bg-green-600 !text-white !h-[64px] opacity-50 shadow-lg" disabled>
+            <button id="sendBtn" class="btn-pro !bg-green-600 !text-white !h-[64px] opacity-50" disabled>
                 <i class="fas fa-paper-plane mr-2"></i> KIRIM ABSEN SEKARANG
             </button>
-            <p id="infoStatus" class="text-[9px] text-slate-400 mt-3 font-bold uppercase italic">Pilih Cabang & Shift</p>
         </div>
     </div>
   </div>
 
-  <div id="dashboard" class="hidden">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-lg font-black text-white italic uppercase">Master Admin</h2>
-      <button onclick="location.reload()" class="text-red-500 font-bold text-[10px] border border-red-500/30 px-3 py-1 rounded-full uppercase">Logout</button>
-    </div>
-
+  <div id="admin" class="hidden pt-10">
+    <button onclick="nav('home')" class="btn-back-global">← Kembali</button>
     <div class="glass-card">
-        <p class="text-[10px] text-gold font-bold mb-3 uppercase text-center">Laporan Bulanan (PDF)</p>
-        <div class="grid grid-cols-2 gap-2 mb-4"><select id="fBulan" class="input-pro"></select><select id="fTahun" class="input-pro"></select></div>
-        <button onclick="openRekap()" class="btn-pro btn-gold"><i class="fas fa-file-export mr-3"></i> GENERATE LAPORAN</button>
+        <p class="text-[10px] text-red-500 font-bold mb-4 text-center uppercase">Akses Admin</p>
+        <input id="pinAdmin" type="password" placeholder="PIN ADMIN" class="input-pro">
+        <button onclick="loginAdmin()" class="btn-pro btn-gold mt-4">MASUK PANEL</button>
+    </div>
+  </div>
+
+  <div id="dashboard" class="hidden pt-10">
+    <button onclick="location.reload()" class="btn-back-global text-red-500">Logout</button>
+    
+    <div class="glass-card">
+        <p class="text-[10px] text-gold font-bold mb-3 uppercase text-center">Rekap Bulanan</p>
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <select id="fBulan" class="input-pro"></select>
+            <select id="fTahun" class="input-pro"></select>
+        </div>
+        <button onclick="generateReport()" class="btn-pro btn-gold">LIHAT LAPORAN</button>
     </div>
 
     <div class="glass-card !p-2">
-      <p class="text-[10px] text-gold font-bold mb-3 uppercase text-center">Monitoring Real-Time</p>
       <div class="grid grid-cols-2 gap-2 mb-3">
         <select id="selCab" onchange="renderAll()" class="input-pro !h-[38px]"></select>
         <input type="date" id="selTgl" onchange="renderAll()" class="input-pro !h-[38px]">
       </div>
       <div class="table-wrapper">
         <table class="pro-table">
-            <thead><tr><th style="width:25%">NAMA</th><th style="width:25%">WAKTU</th><th style="width:15%">LOC</th><th style="width:15%">CAB</th><th style="width:20%">KET</th></tr></thead>
+            <thead><tr><th style="width:30%">NAMA</th><th style="width:25%">WAKTU</th><th style="width:15%">LOC</th><th style="width:30%">KET</th></tr></thead>
             <tbody id="tBodyHarian"></tbody>
         </table>
       </div>
     </div>
 
-    <div class="glass-card !p-2 border-red-500/30">
-        <p class="text-[10px] text-red-500 font-bold mb-3 uppercase text-center"><i class="fas fa-mobile-alt mr-2"></i> Device Management</p>
+    <div class="glass-card !p-2">
+        <p class="text-[10px] text-red-500 font-bold mb-3 uppercase text-center">Device Manager</p>
         <div class="table-wrapper">
             <table class="pro-table">
-                <thead><tr><th style="width:40%">KARYAWAN</th><th style="width:30%">ID HP</th><th style="width:30%">AKSI</th></tr></thead>
+                <thead><tr><th style="width:40%">NAMA</th><th style="width:30%">ID HP</th><th style="width:30%">AKSI</th></tr></thead>
                 <tbody id="tBodyDevice"></tbody>
             </table>
         </div>
     </div>
-
-    <div class="glass-card">
-        <p class="text-[10px] text-gold font-bold mb-6 uppercase text-center">Grafik Telat (Shift 1 & 2)</p>
-        <div class="space-y-10">
-            <div style="height:130px"><canvas id="chartS1"></canvas></div>
-            <div style="height:130px"><canvas id="chartS2"></canvas></div>
-        </div>
-    </div>
   </div>
 
-  <div id="karyawan" class="hidden"><div class="glass-card"><input id="inputID" placeholder="ID (KS4-XXXX)" class="input-pro"><button onclick="prosesLogin()" class="btn-pro btn-gold mt-4">LOGIN</button></div></div>
-  <div id="admin" class="hidden"><div class="glass-card"><input id="pinAdmin" type="password" placeholder="PIN ADMIN" class="input-pro"><button onclick="loginAdmin()" class="btn-pro btn-gold mt-4">MASUK PANEL</button></div></div>
-  <div id="previewOverlay" class="hidden">
-    <div class="flex justify-between items-center mb-6"><button onclick="nav('dashboard')" class="text-white font-bold text-[11px] uppercase border border-slate-700 px-4 py-2 rounded-lg">← Kembali</button></div>
-    <div class="glass-card !p-2 !bg-[#0f172a]"><h2 id="periodTitle" class="text-center text-gold font-black text-[12px] my-6 uppercase"></h2><div class="table-wrapper"><table class="pro-table"><thead><tr><th style="width:30%">NAMA</th><th style="width:25%">CABANG</th><th style="width:20%">HADIR</th><th style="width:25%">TELAT</th></tr></thead><tbody id="rekapBody"></tbody></table></div></div>
+  <div id="reportOverlay" class="hidden">
+    <div class="flex justify-between items-center mb-6">
+        <button onclick="nav('dashboard')" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase">← Tutup</button>
+        <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase shadow-lg"><i class="fas fa-download mr-2"></i> Download PDF</button>
+    </div>
+    <div id="pdfContent" class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-black text-slate-900 uppercase italic">KOPI SETENGAH-4</h2>
+            <p id="reportTitle" class="text-[12px] font-bold text-slate-500 uppercase mt-1"></p>
+        </div>
+        <table class="white-table" id="tablePro">
+            <thead><tr><th>NAMA KARYAWAN</th><th>CABANG</th><th>HADIR</th><th>TELAT</th></tr></thead>
+            <tbody id="reportTableBody"></tbody>
+        </table>
+    </div>
   </div>
 </div>
 
@@ -121,11 +146,11 @@ const firebaseConfig = { apiKey: "AIzaSyChFAEgzpZac2yRvkb9r8f0kFT_j_ji1AA", auth
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const CABANG = { "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9} };
 const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin" };
+const CABANG = { "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9} };
 
 const DEVID = localStorage.getItem('ks4_devid') || localStorage.setItem('ks4_devid', 'DEV-'+Math.random().toString(36).substr(2,9).toUpperCase()) || localStorage.getItem('ks4_devid');
-let logs = []; let uData = null; window.pnd = null; let ch1 = null, ch2 = null;
+let logs = []; let uData = null; window.pnd = null; let currentReportData = [];
 
 window.nav = (id) => {
     document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden'));
@@ -133,10 +158,10 @@ window.nav = (id) => {
     if(id==='dashboard') startSync();
 };
 
-// LOGIN & GEO LOGIC
+// FIX: LOGIN KARYAWAN FUNCTION
 window.prosesLogin = async () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
-    if(!STAFF[id]) return alert("ID SALAH");
+    if(!STAFF[id]) return alert("ID SALAH!");
     const snapLock = await get(ref(db, `locks/${id}`));
     if(snapLock.exists() && snapLock.val() !== DEVID) return alert("DEVICE TERKUNCI!");
     uData = { id, nama: STAFF[id] }; nav('formAbsen');
@@ -145,6 +170,7 @@ window.prosesLogin = async () => {
     Object.keys(CABANG).forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
 };
 
+// FIX: SHIFT SELECTION FUNCTIONS
 window.updateShiftUI = () => {
     const c = document.getElementById('selCabAbsen').value;
     const g = document.getElementById('shiftGrid'); g.innerHTML = ''; window.pnd = null;
@@ -162,17 +188,14 @@ window.selS = (btn, cab, n) => {
 
 document.getElementById('sendBtn').onclick = async () => {
     const {cab, n} = window.pnd; const today = new Date().toLocaleDateString('id-ID');
-    const snapCheck = await get(ref(db, 'absensi'));
-    if(snapCheck.exists() && Object.values(snapCheck.val()).some(l => l.tanggal === today && l.idKaryawan === uData.id)) return alert("SUDAH ABSEN HARI INI!");
-
     navigator.geolocation.getCurrentPosition(async (pos) => {
         const dist = getDistance(pos.coords.latitude, pos.coords.longitude, CABANG[cab].lat, CABANG[cab].lng);
-        if(dist > 0.5) return alert("DILUAR RADIUS!");
+        if(dist > 0.5) return alert("DI LUAR RADIUS!");
         const now = new Date(); const st = (now.getHours() > CABANG[cab]['s'+n] || (now.getHours() === CABANG[cab]['s'+n] && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
         await set(ref(db, `locks/${uData.id}`), DEVID);
         await set(push(ref(db, 'absensi')), { idKaryawan: uData.id, nama: uData.nama, cabang: cab, shift: n, tanggal: today, waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}), ket: st, lat: pos.coords.latitude, lng: pos.coords.longitude, timestamp: serverTimestamp() });
         alert("ABSEN BERHASIL!"); location.reload();
-    }, () => alert("GPS ERROR"), {enableHighAccuracy: true});
+    }, () => alert("AKTIFKAN GPS!"), {enableHighAccuracy: true});
 };
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -181,16 +204,13 @@ function getDistance(lat1, lon1, lat2, lon2) {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-// MASTER ADMIN LOGIC
-window.loginAdmin = () => { if(document.getElementById('pinAdmin').value==='setengah-4all') nav('dashboard'); else alert("PIN SALAH"); };
+// ADMIN DASHBOARD
+window.loginAdmin = () => { if(document.getElementById('pinAdmin').value==='setengah-4all') nav('dashboard'); else alert("SALAH"); };
 
 function startSync() {
     onValue(ref(db, 'absensi'), (snap) => {
-        logs = []; if(snap.exists()) Object.values(snap.val()).forEach(v => {
-            const d = v.timestamp ? new Date(v.timestamp) : new Date();
-            logs.push({...v, dt: d});
-        });
-        renderAll(); updateCharts();
+        logs = []; if(snap.exists()) Object.values(snap.val()).forEach(v => logs.push({...v, dt: v.timestamp ? new Date(v.timestamp) : new Date()}));
+        renderAll();
     });
     onValue(ref(db, 'locks'), (snap) => {
         const bdy = document.getElementById('tBodyDevice'); bdy.innerHTML = '';
@@ -200,7 +220,33 @@ function startSync() {
     });
 }
 
-window.resetD = async (id) => { if(confirm(`Buka kunci HP ${STAFF[id]}?`)) await remove(ref(db, `locks/${id}`)); };
+window.resetD = async (id) => { if(confirm("Reset device?")) await remove(ref(db, `locks/${id}`)); };
+
+window.generateReport = () => {
+    const b = parseInt(document.getElementById('fBulan').value);
+    const t = parseInt(document.getElementById('fTahun').value);
+    const agg = {};
+    logs.filter(l => l.dt.getMonth() === b && l.dt.getFullYear() === t).forEach(l => {
+        if(!agg[l.nama]) agg[l.nama] = {nama: l.nama, cab: l.cabang, abs: 0, tlt: 0};
+        agg[l.nama].abs++; if(l.ket==='TELAT') agg[l.nama].tlt++;
+    });
+    currentReportData = Object.values(agg);
+    const bName = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"][b];
+    document.getElementById('reportTitle').innerText = `Laporan Kehadiran ${bName} ${t}`;
+    const bdy = document.getElementById('reportTableBody'); bdy.innerHTML = '';
+    currentReportData.forEach(r => { bdy.innerHTML += `<tr><td class="font-bold uppercase text-left pl-6">${r.nama}</td><td>${r.cab}</td><td>${r.abs}</td><td class="font-black text-red-600">${r.tlt}</td></tr>`; });
+    nav('reportOverlay');
+};
+
+window.downloadPDF = () => {
+    const { jsPDF } = window.jspdf; const doc = new jsPDF();
+    const title = document.getElementById('reportTitle').innerText;
+    doc.setFontSize(18); doc.text("KOPI SETENGAH-4", 105, 20, {align: 'center'});
+    doc.setFontSize(11); doc.text(title, 105, 28, {align: 'center'});
+    const rows = currentReportData.map(r => [r.nama, r.cab, r.abs, r.tlt]);
+    doc.autoTable({ startY: 35, head: [['NAMA KARYAWAN', 'CABANG', 'TOTAL HADIR', 'TOTAL TELAT']], body: rows, theme: 'grid', headStyles: { fillColor: [30, 41, 59] }});
+    doc.save(`Laporan_${title.replace(/ /g,'_')}.pdf`);
+};
 
 window.renderAll = () => {
     const bdy = document.getElementById('tBodyHarian');
@@ -209,29 +255,8 @@ window.renderAll = () => {
     const cab = document.getElementById('selCab').value;
     bdy.innerHTML = '';
     logs.filter(l => l.tanggal === target && (cab==='Semua' || l.cabang===cab)).forEach(l => {
-        bdy.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}</td><td>${l.waktu}</td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td><td>${l.cabang.split(' ')[0]}</td><td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
+        bdy.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}</td><td>${l.waktu}</td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td><td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
     });
-};
-
-function updateCharts() {
-    const labels = Object.keys(CABANG).map(c => c.split(' ')[0]);
-    const d1 = Object.keys(CABANG).map(c => logs.filter(l => l.cabang === c && l.shift === 1 && l.ket === 'TELAT').length);
-    const d2 = Object.keys(CABANG).map(c => logs.filter(l => l.cabang === c && l.shift === 2 && l.ket === 'TELAT').length);
-    if(ch1) ch1.destroy(); if(ch2) ch2.destroy();
-    ch1 = new Chart(document.getElementById('chartS1'), {type:'bar', data:{labels, datasets:[{label:'Shift 1 Telat', data:d1, backgroundColor:'#ef4444'}]}, options:{maintainAspectRatio:false, plugins:{legend:{labels:{color:'#fff', font:{size:10}}}}}});
-    ch2 = new Chart(document.getElementById('chartS2'), {type:'bar', data:{labels, datasets:[{label:'Shift 2 Telat', data:d2, backgroundColor:'#f59e0b'}]}, options:{maintainAspectRatio:false, plugins:{legend:{labels:{color:'#fff', font:{size:10}}}}}});
-}
-
-window.openRekap = () => {
-    const b = parseInt(document.getElementById('fBulan').value), t = parseInt(document.getElementById('fTahun').value);
-    const agg = {}; logs.filter(l => l.dt.getMonth() === b && l.dt.getFullYear() === t).forEach(l => {
-        if(!agg[l.nama]) agg[l.nama] = {nama: l.nama, cab: l.cabang.split(' ')[0], abs: 0, tlt: 0};
-        agg[l.nama].abs++; if(l.ket==='TELAT') agg[l.nama].tlt++;
-    });
-    nav('previewOverlay'); 
-    document.getElementById('periodTitle').innerText = `REKAP ${b+1}/${t}`;
-    document.getElementById('rekapBody').innerHTML = '';
-    Object.values(agg).forEach(r => document.getElementById('rekapBody').innerHTML += `<tr><td class="font-bold text-white uppercase">${r.nama}</td><td>${r.cab}</td><td>${r.abs}</td><td>${r.tlt}</td></tr>`);
 };
 
 // INITIALIZE
