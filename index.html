@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v135 - Custom Abbreviation</title>
+  <title>Kopi Setengah-4 v136 - Double Lock System</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -86,7 +86,6 @@
 
   <div id="dashboard" class="hidden pt-10">
     <button onclick="location.reload()" class="btn-back-global text-red-500">Logout</button>
-    
     <div class="glass-card">
         <p class="text-[10px] text-gold font-bold mb-3 uppercase text-center">Rekap Bulanan</p>
         <div class="grid grid-cols-2 gap-2 mb-4">
@@ -97,7 +96,6 @@
     </div>
 
     <div class="glass-card !p-2">
-      <p class="text-[10px] text-gold font-bold mb-3 uppercase text-center">Monitoring Harian</p>
       <div class="grid grid-cols-2 gap-2 mb-3">
         <select id="selCab" onchange="renderAll()" class="input-pro !h-[38px]"></select>
         <input type="date" id="selTgl" onchange="renderAll()" class="input-pro !h-[38px]">
@@ -149,7 +147,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, set, serverTimestamp, get, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, push, set, serverTimestamp, get, remove, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = { apiKey: "AIzaSyChFAEgzpZac2yRvkb9r8f0kFT_j_ji1AA", authDomain: "absensi-kopi-setengah-4.firebaseapp.com", databaseURL: "https://absensi-kopi-setengah-4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "absensi-kopi-setengah-4" };
 const app = initializeApp(firebaseConfig);
@@ -158,7 +156,6 @@ const db = getDatabase(app);
 const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin" };
 const CABANG = { "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9} };
 
-// FUNGSI SINGKATAN CABANG
 const singkatan = (name) => {
     if(name === "Tanjung Duren") return "Tandur";
     if(name === "Cempaka Putih") return "Cemput";
@@ -202,7 +199,22 @@ window.selS = (btn, cab, n) => {
 };
 
 document.getElementById('sendBtn').onclick = async () => {
-    const {cab, n} = window.pnd; const today = new Date().toLocaleDateString('id-ID');
+    const {cab, n} = window.pnd; 
+    const today = new Date().toLocaleDateString('id-ID');
+    
+    // START VALIDASI DOUBLE ABSEN
+    const snapAll = await get(ref(db, 'absensi'));
+    let hasAbsen = false;
+    if (snapAll.exists()) {
+        const allData = Object.values(snapAll.val());
+        hasAbsen = allData.some(entry => entry.idKaryawan === uData.id && entry.tanggal === today);
+    }
+
+    if (hasAbsen) {
+        return alert("ANDA SUDAH ABSEN HARI INI (DI CABANG MANAPUN)!");
+    }
+    // END VALIDASI DOUBLE ABSEN
+
     navigator.geolocation.getCurrentPosition(async (pos) => {
         const dist = getDistance(pos.coords.latitude, pos.coords.longitude, CABANG[cab].lat, CABANG[cab].lng);
         if(dist > 0.5) return alert("DI LUAR RADIUS!");
@@ -236,7 +248,6 @@ function startSync() {
 
 window.resetD = async (id) => { if(confirm("Reset device?")) await remove(ref(db, `locks/${id}`)); };
 
-// RENDER TABEL HARIAN DENGAN SINGKATAN
 window.renderAll = () => {
     const bdy = document.getElementById('tBodyHarian');
     const tgl = document.getElementById('selTgl').value || new Date().toLocaleDateString('en-CA');
@@ -244,14 +255,7 @@ window.renderAll = () => {
     const cabFilter = document.getElementById('selCab').value;
     bdy.innerHTML = '';
     logs.filter(l => l.tanggal === target && (cabFilter==='Semua' || l.cabang===cabFilter)).forEach(l => {
-        bdy.innerHTML += `
-        <tr>
-            <td class="font-bold text-white uppercase">${l.nama}</td>
-            <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
-            <td>${l.waktu}</td>
-            <td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td>
-            <td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td>
-        </tr>`;
+        bdy.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}</td><td class="text-gold font-bold">${singkatan(l.cabang)}</td><td>${l.waktu}</td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td><td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
     });
 };
 
@@ -281,13 +285,15 @@ window.downloadPDF = () => {
     doc.save(`Laporan_${title.replace(/ /g,'_')}.pdf`);
 };
 
+// INITIALIZE
 const ms = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 ms.forEach((m, i) => document.getElementById('fBulan').innerHTML += `<option value="${i}">${m}</option>`);
 [2025, 2026].forEach(y => document.getElementById('fTahun').innerHTML += `<option value="${y}">${y}</option>`);
 document.getElementById('fBulan').value = new Date().getMonth();
+document.getElementById('fTahun').value = new Date().getFullYear();
 document.getElementById('selTgl').value = new Date().toLocaleDateString('en-CA');
 const sc = document.getElementById('selCab'); sc.innerHTML = '<option value="Semua">SEMUA CABANG</option>';
 Object.keys(CABANG).forEach(c => sc.innerHTML += `<option value="${c}">${c}</option>`);
 </script>
 </body>
-  </html>
+</html>
