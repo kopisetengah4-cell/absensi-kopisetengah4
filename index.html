@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v109 - Master Aggregation</title>
+  <title>Kopi Setengah-4 v112 - Security & Geofence</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,63 +13,24 @@
   
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-    
-    :root {
-      --gold: #c29851;
-      --dark-bg: #0f172a;
-      --card-bg: #1e293b;
-      --border: #334155;
-    }
-
+    :root { --gold: #c29851; --dark-bg: #0f172a; --card-bg: #1e293b; --border: #334155; }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background-color: var(--dark-bg); color: #f8fafc; margin: 0; overflow-x: hidden; width: 100vw; }
-    
     .main-container { width: 94%; margin: 0 auto; padding: 15px 0; }
-    
-    .glass-card { 
-      background: var(--card-bg); 
-      border-radius: 16px; 
-      padding: 18px; 
-      border: 1px solid var(--border); 
-      margin-bottom: 20px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-    
-    .table-wrapper { 
-      width: 100%; 
-      border-radius: 12px; 
-      overflow: hidden; 
-      border: 1px solid var(--border);
-      background: #0f172a;
-    }
+    .glass-card { background: var(--card-bg); border-radius: 16px; padding: 18px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+    .table-wrapper { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #0f172a; }
     .pro-table { width: 100%; table-layout: fixed; border-collapse: collapse; }
     .pro-table th { background: #1e293b; color: var(--gold); font-size: 7px; padding: 12px 2px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
-    .pro-table td { font-size: 8px; padding: 10px 2px; border-bottom: 1px solid var(--border); text-align: center; word-wrap: break-word; color: #cbd5e1; }
-
-    /* UNIFIED BUTTONS SYSTEM */
-    .btn-pro { 
-      width: 100%; 
-      height: 52px; 
-      border-radius: 12px; 
-      font-weight: 800; 
-      text-transform: uppercase; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      font-size: 13px;
-      border: none;
-      transition: all 0.2s;
-    }
+    .pro-table td { font-size: 8px; padding: 10px 2px; border-bottom: 1px solid var(--border); text-align: center; color: #cbd5e1; }
+    
+    .btn-pro { width: 100%; height: 52px; border-radius: 12px; font-weight: 800; text-transform: uppercase; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; border: none; transition: all 0.3s ease; }
     .btn-gold { background: var(--gold); color: #000; box-shadow: 0 4px 0 #8e6d35; }
-    .btn-gold:active { transform: translateY(2px); box-shadow: 0 0 0 transparent; }
-    
     .btn-dark { background: #334155; color: #cbd5e1; border: 1px solid #475569; }
-
-    .input-pro { background: #fff !important; color: #000 !important; width: 100%; border-radius: 10px; font-weight: 700; height: 44px; text-align: center; border: 2px solid var(--gold); font-size: 12px; outline: none; }
-    .status-pill { padding: 3px 5px; border-radius: 4px; font-size: 7px; font-weight: 900; color: white; }
+    .btn-active-shift { background: #16a34a !important; color: white !important; border-color: #15803d !important; transform: scale(0.98); }
     
-    #previewOverlay { background: var(--dark-bg); position: fixed; inset: 0; z-index: 2000; padding: 15px; overflow-y: auto; }
+    .input-pro { background: #fff !important; color: #000 !important; width: 100%; border-radius: 10px; font-weight: 700; height: 44px; text-align: center; border: 2px solid var(--gold); font-size: 12px; outline: none; }
     .hidden { display: none !important; }
+    #previewOverlay { background: var(--dark-bg); position: fixed; inset: 0; z-index: 2000; padding: 15px; overflow-y: auto; }
   </style>
 </head>
 <body>
@@ -88,86 +49,65 @@
       <h2 class="text-lg font-black text-white italic">ADMIN PANEL</h2>
       <button onclick="nav('home')" class="text-red-500 font-bold text-[10px] border border-red-500/30 px-3 py-1 rounded-full uppercase">Logout</button>
     </div>
-
     <div class="glass-card">
-        <p class="text-[9px] font-bold text-slate-400 mb-3 text-center uppercase tracking-widest italic">Pilih Periode Laporan</p>
-        <div class="grid grid-cols-2 gap-2 mb-4">
-            <select id="fBulan" class="input-pro"></select>
-            <select id="fTahun" class="input-pro"></select>
-        </div>
-        <button onclick="openRekap()" class="btn-pro btn-dark">
-            <i class="fas fa-file-invoice mr-3"></i> LIHAT REKAP BULANAN
-        </button>
+        <div class="grid grid-cols-2 gap-2 mb-4"><select id="fBulan" class="input-pro"></select><select id="fTahun" class="input-pro"></select></div>
+        <button onclick="openRekap()" class="btn-pro btn-dark"><i class="fas fa-file-invoice mr-3"></i> LIHAT REKAP BULANAN</button>
     </div>
-
     <div class="glass-card !p-2">
-      <div class="grid grid-cols-2 gap-2 p-1 mb-3">
-        <select id="selCab" onchange="renderTable()" class="input-pro !h-[38px] !text-[10px]"></select>
-        <input type="date" id="selTgl" onchange="renderTable()" class="input-pro !h-[38px] !text-[10px]">
-      </div>
-      <div class="table-wrapper">
-        <table class="pro-table">
-            <thead>
-                <tr>
-                    <th style="width: 25%;">KARYAWAN</th>
-                    <th style="width: 10%;">GPS</th>
-                    <th style="width: 25%;">WAKTU & TGL</th>
-                    <th style="width: 20%;">CABANG</th>
-                    <th style="width: 20%;">STATUS</th>
-                </tr>
-            </thead>
-            <tbody id="tBodyHarian"></tbody>
-        </table>
-      </div>
+      <div class="grid grid-cols-2 gap-2 p-1 mb-3"><select id="selCab" onchange="renderTable()" class="input-pro !h-[38px]"></select><input type="date" id="selTgl" onchange="renderTable()" class="input-pro !h-[38px]"></div>
+      <div class="table-wrapper"><table class="pro-table"><thead><tr><th style="width:25%">NAMA</th><th style="width:10%">GPS</th><th style="width:25%">WAKTU</th><th style="width:20%">CABANG</th><th style="width:20%">KET</th></tr></thead><tbody id="tBodyHarian"></tbody></table></div>
     </div>
+  </div>
 
-    <div class="glass-card">
-        <div class="space-y-10">
-            <div style="height:140px"><canvas id="chartS1"></canvas></div>
-            <div style="height:140px"><canvas id="chartS2"></canvas></div>
+  <div id="formAbsen" class="hidden">
+    <div class="glass-card text-center">
+        <p class="text-[10px] text-slate-500 uppercase font-bold mb-1 italic">Absensi Hari Ini</p>
+        <h2 id="nameDisplay" class="text-xl font-black text-white mb-6 uppercase tracking-tighter"></h2>
+        
+        <select id="selCabAbsen" class="input-pro mb-4" onchange="updateShiftUI()">
+            <option value="">-- PILIH LOKASI KERJA --</option>
+        </select>
+        
+        <div id="shiftGrid" class="grid grid-cols-1 gap-3 mb-6"></div>
+        
+        <div id="finalAction" class="hidden border-t border-slate-700 pt-6">
+            <p id="locStatus" class="text-[10px] font-bold mb-4"></p>
+            <button id="sendBtn" class="btn-pro !bg-green-600 !text-white !h-[60px] shadow-lg shadow-green-900/40">KIRIM DATA ABSENSI SEKARANG</button>
         </div>
     </div>
   </div>
 
+  <div id="karyawan" class="hidden"><div class="glass-card"><h2 class="text-center text-gold font-bold mb-4 uppercase">Login Karyawan</h2><input id="inputID" placeholder="ID (KS4-XXXX)" class="input-pro"><button onclick="prosesLogin()" class="btn-pro btn-gold mt-4">MASUK</button></div></div>
+  <div id="admin" class="hidden"><div class="glass-card"><h2 class="text-center text-gold font-bold mb-4 uppercase">Akses Admin</h2><input id="pinAdmin" type="password" placeholder="PIN" class="input-pro"><button onclick="loginAdmin()" class="btn-pro btn-gold mt-4">MASUK</button></div></div>
   <div id="previewOverlay" class="hidden">
-    <div class="flex justify-between items-center mb-6">
-        <button onclick="nav('dashboard')" class="text-white font-bold text-[11px] uppercase border border-slate-700 px-4 py-2 rounded-lg">← KEMBALI</button>
-        <button onclick="generatePDF()" class="bg-green-600 text-white px-5 py-2 rounded-xl text-[10px] font-bold uppercase shadow-lg shadow-green-900/20">UNDUH PDF</button>
-    </div>
-    <div class="glass-card !p-2 !bg-[#0f172a]">
-        <h2 id="periodTitle" class="text-center text-gold font-black text-[12px] my-6 uppercase tracking-widest italic"></h2>
-        <div class="table-wrapper">
-            <table class="pro-table" id="tablePDF">
-                <thead>
-                    <tr>
-                        <th style="width: 30%;">NAMA KARYAWAN</th>
-                        <th style="width: 25%;">CABANG TERAKHIR</th>
-                        <th style="width: 20%;">TOTAL ABSEN</th>
-                        <th style="width: 25%;">TOTAL TERLAMBAT</th>
-                    </tr>
-                </thead>
-                <tbody id="rekapBody"></tbody>
-            </table>
-        </div>
-    </div>
+    <div class="flex justify-between items-center mb-6"><button onclick="nav('dashboard')" class="text-white font-bold text-[11px] uppercase border border-slate-700 px-4 py-2 rounded-lg">← Kembali</button><button onclick="generatePDF()" class="bg-green-600 text-white px-5 py-2 rounded-xl text-[10px] font-bold">UNDUH PDF</button></div>
+    <div class="glass-card !p-2 !bg-[#0f172a]"><h2 id="periodTitle" class="text-center text-gold font-black text-[12px] my-6 uppercase"></h2><div class="table-wrapper"><table class="pro-table" id="tablePDF"><thead><tr><th style="width:30%">NAMA</th><th style="width:25%">CABANG</th><th style="width:20%">ABSEN</th><th style="width:25%">TELAT</th></tr></thead><tbody id="rekapBody"></tbody></table></div></div>
   </div>
-
-  <div id="karyawan" class="hidden"><div class="glass-card"><h2 class="text-center text-gold font-bold mb-4 uppercase">Identitas Karyawan</h2><input id="inputID" placeholder="ID (KS4-XXXX)" class="input-pro"><button onclick="prosesLogin()" class="btn-pro btn-gold mt-4">MASUK</button></div></div>
-  <div id="admin" class="hidden"><div class="glass-card"><h2 class="text-center text-gold font-bold mb-4 uppercase">Akses Admin</h2><input id="pinAdmin" type="password" placeholder="PIN" class="input-pro"><button onclick="loginAdmin()" class="btn-pro btn-gold mt-4">LOGIN</button></div></div>
-  <div id="formAbsen" class="hidden"><div class="glass-card text-center"><p class="text-[10px] text-slate-500 uppercase font-bold mb-1">Anda masuk sebagai</p><h2 id="nameDisplay" class="text-xl font-black text-white mb-6 uppercase"></h2><select id="selCabAbsen" class="input-pro mb-4" onchange="updateShiftUI()"></select><div id="shiftGrid" class="grid grid-cols-1 gap-3"></div><div id="finalAction" class="hidden mt-8"><button id="sendBtn" class="btn-pro !bg-green-600 !text-white shadow-lg shadow-green-900/40">KIRIM DATA ABSENSI SEKARANG</button></div></div></div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, push, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = { apiKey: "AIzaSyChFAEgzpZac2yRvkb9r8f0kFT_j_ji1AA", authDomain: "absensi-kopi-setengah-4.firebaseapp.com", databaseURL: "https://absensi-kopi-setengah-4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "absensi-kopi-setengah-4" };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const CABANG = { "Pondok Indah": {lat:-6.269, lng:106.78, s1:8}, "Menteng": {lat:-6.19, lng:106.82, s1:8}, "Cempaka Putih": {lat:-6.17, lng:106.87, s1:9}, "Tanjung Duren": {lat:-6.17, lng:106.79, s1:8, s2:15}, "Otista": {lat:-6.24, lng:106.86, s1:8, s2:15}, "Kebon Jeruk": {lat:-6.19, lng:106.76, s1:8, s2:14} };
+// KOORDINAT CABANG (Geofence)
+const CABANG = { 
+    "Pondok Indah": {lat:-6.269, lng:106.78, s1:8}, 
+    "Menteng": {lat:-6.19, lng:106.82, s1:8}, 
+    "Cempaka Putih": {lat:-6.17, lng:106.87, s1:9}, 
+    "Tanjung Duren": {lat:-6.17, lng:106.79, s1:8, s2:15}, 
+    "Otista": {lat:-6.24, lng:106.86, s1:8, s2:15}, 
+    "Kebon Jeruk": {lat:-6.19, lng:106.76, s1:8, s2:14} 
+};
 const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin" };
-let logs = []; let c1=null, c2=null; let uData=null;
+let logs = []; let uData = null;
+
+// DEVICE FINGERPRINT
+if(!localStorage.getItem('ks4_devid')) localStorage.setItem('ks4_devid', 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase());
+const DEVID = localStorage.getItem('ks4_devid');
 
 window.nav = (id) => {
     document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden'));
@@ -182,101 +122,125 @@ function startSync() {
             const d = v.timestamp ? new Date(v.timestamp) : new Date();
             logs.push({...v, dt: d, iso: d.toISOString().split('T')[0]});
         });
-        renderTable(); updateChart();
+        renderTable();
     });
+}
+
+// LOGIKA PILIH SHIFT (Warna Hijau + Jam)
+window.selectShift = (btn, cab, n) => {
+    document.querySelectorAll('.btn-shift-item').forEach(b => {
+        b.classList.remove('btn-active-shift');
+        b.innerHTML = b.getAttribute('data-orig');
+    });
+    
+    btn.classList.add('btn-active-shift');
+    const now = new Date();
+    const jamSkrg = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+    btn.innerHTML = `<div>SHIFT ${n}</div><div class="text-[10px] opacity-80 mt-1"><i class="far fa-clock mr-1"></i> ${jamSkrg}</div>`;
+    
+    window.pending = {c: cab, n: n};
+    checkSecurityAndLoc();
+};
+
+async function checkSecurityAndLoc() {
+    const today = new Date().toLocaleDateString('id-ID');
+    const finalUI = document.getElementById('finalAction');
+    const locMsg = document.getElementById('locStatus');
+    
+    // 1. CEK DOUBLE ABSEN (Name & Device)
+    const snapshot = await get(ref(db, 'absensi'));
+    let hasAbsen = false;
+    if(snapshot.exists()){
+        const data = Object.values(snapshot.val());
+        hasAbsen = data.some(l => l.tanggal === today && (l.nama === uData.nama || l.deviceId === DEVID));
+    }
+
+    if(hasAbsen) {
+        locMsg.innerHTML = "❌ ANDA / PERANGKAT INI SUDAH ABSEN HARI INI";
+        locMsg.className = "text-red-500 font-bold text-xs animate-pulse";
+        finalUI.classList.remove('hidden');
+        document.getElementById('sendBtn').classList.add('hidden');
+        return;
+    }
+
+    // 2. CEK LOKASI (Geofence 100m)
+    navigator.geolocation.getCurrentPosition(pos => {
+        const dist = getDistance(pos.coords.latitude, pos.coords.longitude, CABANG[window.pending.c].lat, CABANG[window.pending.c].lng);
+        if(dist <= 0.1) { // 100 Meter
+            locMsg.innerHTML = "✅ LOKASI TERVERIFIKASI (Area Cabang)";
+            locMsg.className = "text-green-500 font-bold text-xs";
+            document.getElementById('sendBtn').classList.remove('hidden');
+            window.pending.coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        } else {
+            locMsg.innerHTML = "❌ ANDA DI LUAR AREA (Jarak: " + (dist*1000).toFixed(0) + "m)";
+            locMsg.className = "text-yellow-500 font-bold text-xs";
+            document.getElementById('sendBtn').classList.add('hidden');
+        }
+        finalUI.classList.remove('hidden');
+    }, () => alert("GPS WAJIB AKTIF!"));
+}
+
+function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180;
+    const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
 window.renderTable = () => {
-    const cab = document.getElementById('selCab').value || 'Semua';
-    const tgl = document.getElementById('selTgl').value || new Date().toISOString().split('T')[0];
     const bdy = document.getElementById('tBodyHarian');
+    const tgl = document.getElementById('selTgl').value || new Date().toISOString().split('T')[0];
     if(!bdy) return; bdy.innerHTML = '';
-    logs.filter(l => (cab === 'Semua' || l.cabang === cab) && l.iso === tgl).forEach(l => {
-        bdy.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}<br><span class="text-[6px] text-slate-500">${l.deviceId || 'DEVICE'}</span></td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank" class="text-blue-400">📍</a></td><td>${l.waktu}<br><span class="text-[7px] text-slate-500">${l.tanggal}</span></td><td>${l.cabang.split(' ')[0]}</td><td><span class="status-pill ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
+    logs.filter(l => l.iso === tgl).forEach(l => {
+        bdy.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}</td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td><td>${l.waktu}</td><td>${l.cabang.split(' ')[0]}</td><td><span class="px-2 py-1 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
     });
 };
 
-// MASTER AGGREGATION LOGIC (1 NAMA PER BULAN)
-window.openRekap = () => {
-    const b = parseInt(document.getElementById('fBulan').value);
-    const t = parseInt(document.getElementById('fTahun').value);
-    const filteredData = logs.filter(l => l.dt.getMonth() === b && l.dt.getFullYear() === t);
-    
-    if(filteredData.length === 0) return alert("Belum ada data pada periode ini.");
-
-    // Gabungkan data berdasarkan Nama
-    const aggregation = {};
-    filteredData.forEach(l => {
-        if(!aggregation[l.nama]) {
-            aggregation[l.nama] = {
-                nama: l.nama,
-                cabang: l.cabang.split(' ')[0],
-                totalAbsen: 0,
-                totalTelat: 0
-            };
-        }
-        aggregation[l.nama].totalAbsen += 1;
-        if(l.ket === 'TELAT') aggregation[l.nama].totalTelat += 1;
-        // Update cabang ke yang terbaru jika ada beberapa record
-        aggregation[l.nama].cabang = l.cabang.split(' ')[0];
-    });
-
-    nav('previewOverlay');
-    const ms = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-    document.getElementById('periodTitle').innerText = `${ms[b].toUpperCase()} ${t}`;
-    
-    const bdy = document.getElementById('rekapBody'); bdy.innerHTML = '';
-    Object.values(aggregation).forEach(row => {
-        bdy.innerHTML += `<tr>
-            <td class="font-bold text-white uppercase">${row.nama}</td>
-            <td>${row.cabang}</td>
-            <td class="font-bold">${row.totalAbsen}</td>
-            <td class="font-bold text-red-400">${row.totalTelat}</td>
-        </tr>`;
-    });
-};
-
-function updateChart() {
-    const ctx1 = document.getElementById('chartS1');
-    const ctx2 = document.getElementById('chartS2');
-    if(!ctx1 || !ctx2) return;
-    const lbls = Object.keys(CABANG).map(c => c.split(' ')[0]);
-    const d1 = Object.keys(CABANG).map(c => logs.filter(l => l.cabang === c && l.ket === 'TELAT' && (l.shift === 1 || !l.shift)).length);
-    const d2 = Object.keys(CABANG).map(c => logs.filter(l => l.cabang === c && l.ket === 'TELAT' && l.shift === 2).length);
-    if(c1) c1.destroy(); c1 = new Chart(ctx1, { type:'bar', data:{ labels:lbls, datasets:[{label:'S1 Telat', data:d1, backgroundColor:'#ef4444'}] }, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}}});
-    if(c2) c2.destroy(); c2 = new Chart(ctx2, { type:'bar', data:{ labels:lbls, datasets:[{label:'S2 Telat', data:d2, backgroundColor:'#f59e0b'}] }, options:{maintainAspectRatio:false, plugins:{legend:{display:false}}}});
-}
-
-window.generatePDF = () => {
-    const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.setFontSize(14); doc.text("LAPORAN REKAP BULANAN KOPI SETENGAH-4", 105, 15, { align: 'center' });
-    doc.autoTable({ html: '#tablePDF', startY: 25, theme: 'grid', styles: { fontSize: 9, cellPadding: 3, halign: 'center' }, headStyles: { fillStyle: '#1e293b', textColor: '#c29851' } });
-    doc.save(`Rekap_KS4_${Date.now()}.pdf`);
-};
-
-window.loginAdmin = () => { if(document.getElementById('pinAdmin').value === 'setengah-4all') nav('dashboard'); else alert("PIN SALAH"); };
 window.prosesLogin = () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
-    if(STAFF[id]) { uData = { id, nama: STAFF[id], dev: localStorage.getItem('ks4_dev') || 'DEV-'+Math.random().toString(36).substr(2,6) }; localStorage.setItem('ks4_dev', uData.dev); nav('formAbsen'); document.getElementById('nameDisplay').innerText = uData.nama; buildCabangAbsen(); }
-    else alert("ID TIDAK TERDAFTAR");
-};
-function buildCabangAbsen() { const s = document.getElementById('selCabAbsen'); s.innerHTML = '<option value="">-- PILIH CABANG --</option>'; Object.keys(CABANG).forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`); }
-window.updateShiftUI = () => { const c = document.getElementById('selCabAbsen').value; const g = document.getElementById('shiftGrid'); g.innerHTML = ''; if(!c) return; const ss = CABANG[c].s2 ? [1,2] : [1]; ss.forEach(n => g.innerHTML += `<button onclick="window.pending={c:'${c}',n:${n}}; document.getElementById('finalAction').classList.remove('hidden');" class="btn-pro btn-dark">ABSEN SHIFT ${n}</button>`); };
-document.getElementById('sendBtn').onclick = () => {
-    navigator.geolocation.getCurrentPosition(p => {
-        const {c,n} = window.pending; const now = new Date(); const lim = CABANG[c]['s'+n];
-        const st = (now.getHours() > lim || (now.getHours() === lim && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
-        set(push(ref(db, 'absensi')), { nama: uData.nama, cabang: c, shift: n, tanggal: now.toLocaleDateString('id-ID'), waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}), ket: st, deviceId: uData.dev, lat: p.coords.latitude, lng: p.coords.longitude, timestamp: serverTimestamp() }).then(() => { alert("ABSENSI BERHASIL!"); nav('home'); });
-    }, () => alert("GPS Gagal!"));
+    if(STAFF[id]) { 
+        uData = { id, nama: STAFF[id] }; 
+        nav('formAbsen'); 
+        document.getElementById('nameDisplay').innerText = uData.nama; 
+        const s = document.getElementById('selCabAbsen');
+        s.innerHTML = '<option value="">-- PILIH LOKASI KERJA --</option>';
+        Object.keys(CABANG).forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
+    } else alert("ID TIDAK VALID");
 };
 
+window.updateShiftUI = () => {
+    const c = document.getElementById('selCabAbsen').value;
+    const g = document.getElementById('shiftGrid');
+    document.getElementById('finalAction').classList.add('hidden');
+    g.innerHTML = ''; if(!c) return;
+    const ss = CABANG[c].s2 ? [1,2] : [1];
+    ss.forEach(n => {
+        const btnHtml = `SHIFT ${n}`;
+        g.innerHTML += `<button onclick="selectShift(this, '${c}', ${n})" data-orig="${btnHtml}" class="btn-pro btn-dark btn-shift-item">${btnHtml}</button>`;
+    });
+};
+
+document.getElementById('sendBtn').onclick = () => {
+    const {c,n,coords} = window.pending;
+    const now = new Date();
+    const limit = CABANG[c]['s'+n];
+    const status = (now.getHours() > limit || (now.getHours() === limit && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
+    
+    set(push(ref(db, 'absensi')), {
+        nama: uData.nama, cabang: c, shift: n, tanggal: now.toLocaleDateString('id-ID'),
+        waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}),
+        ket: status, deviceId: DEVID, lat: coords.lat, lng: coords.lng, timestamp: serverTimestamp()
+    }).then(() => { alert("ABSENSI BERHASIL TERKIRIM!"); nav('home'); });
+};
+
+// INITIALIZE FILTERS
 const ms = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 ms.forEach((m, i) => document.getElementById('fBulan').innerHTML += `<option value="${i}">${m}</option>`);
-[2025, 2026, 2027].forEach(y => document.getElementById('fTahun').innerHTML += `<option value="${y}">${y}</option>`);
-const nDt = new Date(); document.getElementById('fBulan').value = nDt.getMonth(); document.getElementById('fTahun').value = nDt.getFullYear();
+[2025, 2026].forEach(y => document.getElementById('fTahun').innerHTML += `<option value="${y}">${y}</option>`);
+document.getElementById('fBulan').value = new Date().getMonth();
+document.getElementById('fTahun').value = new Date().getFullYear();
+document.getElementById('selTgl').value = new Date().toISOString().split('T')[0];
 const sCab = document.getElementById('selCab'); sCab.innerHTML = '<option value="Semua">SEMUA CABANG</option>';
 Object.keys(CABANG).forEach(c => sCab.innerHTML += `<option value="${c}">${c}</option>`);
-document.getElementById('selTgl').value = nDt.toISOString().split('T')[0];
 </script>
 </body>
 </html>
