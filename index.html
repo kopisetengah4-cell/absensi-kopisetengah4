@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v136 - Double Lock System</title>
+  <title>Kopi Setengah-4 v137 - Shift Lock System</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -68,9 +67,7 @@
         <select id="selCabAbsen" class="input-pro mb-6" onchange="updateShiftUI()"><option value="">-- CABANG --</option></select>
         <div id="shiftGrid" class="grid grid-cols-1 gap-4 mb-8"></div>
         <div class="border-t border-slate-700 pt-6">
-            <button id="sendBtn" class="btn-pro !bg-green-600 !text-white !h-[64px] opacity-50" disabled>
-                <i class="fas fa-paper-plane mr-2"></i> KIRIM ABSEN SEKARANG
-            </button>
+            <button id="sendBtn" class="btn-pro !bg-green-600 !text-white !h-[64px] opacity-50" disabled>KIRIM ABSEN SEKARANG</button>
         </div>
     </div>
   </div>
@@ -102,15 +99,7 @@
       </div>
       <div class="table-wrapper">
         <table class="pro-table">
-            <thead>
-                <tr>
-                    <th style="width:28%">NAMA</th>
-                    <th style="width:22%">CABANG</th>
-                    <th style="width:18%">WAKTU</th>
-                    <th style="width:12%">LOC</th>
-                    <th style="width:20%">KET</th>
-                </tr>
-            </thead>
+            <thead><tr><th style="width:28%">NAMA</th><th style="width:22%">CABANG</th><th style="width:18%">WAKTU</th><th style="width:12%">LOC</th><th style="width:20%">KET</th></tr></thead>
             <tbody id="tBodyHarian"></tbody>
         </table>
       </div>
@@ -130,7 +119,7 @@
   <div id="reportOverlay" class="hidden">
     <div class="flex justify-between items-center mb-6">
         <button onclick="nav('dashboard')" class="bg-slate-800 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase">← Tutup</button>
-        <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase shadow-lg">Download PDF</button>
+        <button onclick="downloadPDF()" class="bg-green-600 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase">Download PDF</button>
     </div>
     <div id="pdfContent" class="bg-white p-6 rounded-lg shadow-sm">
         <div class="text-center mb-6">
@@ -147,7 +136,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, set, serverTimestamp, get, remove, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, push, set, serverTimestamp, get, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = { apiKey: "AIzaSyChFAEgzpZac2yRvkb9r8f0kFT_j_ji1AA", authDomain: "absensi-kopi-setengah-4.firebaseapp.com", databaseURL: "https://absensi-kopi-setengah-4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "absensi-kopi-setengah-4" };
 const app = initializeApp(firebaseConfig);
@@ -202,18 +191,21 @@ document.getElementById('sendBtn').onclick = async () => {
     const {cab, n} = window.pnd; 
     const today = new Date().toLocaleDateString('id-ID');
     
-    // START VALIDASI DOUBLE ABSEN
+    // --- START TRIPLE LOCK LOGIC ---
     const snapAll = await get(ref(db, 'absensi'));
-    let hasAbsen = false;
+    let idLock = false; let shiftLock = false;
+    
     if (snapAll.exists()) {
         const allData = Object.values(snapAll.val());
-        hasAbsen = allData.some(entry => entry.idKaryawan === uData.id && entry.tanggal === today);
+        // 1. Lock ID Karyawan (1x per hari)
+        idLock = allData.some(e => e.idKaryawan === uData.id && e.tanggal === today);
+        // 2. Lock Shift Per Cabang (1x per hari)
+        shiftLock = allData.some(e => e.cabang === cab && e.shift === n && e.tanggal === today);
     }
 
-    if (hasAbsen) {
-        return alert("ANDA SUDAH ABSEN HARI INI (DI CABANG MANAPUN)!");
-    }
-    // END VALIDASI DOUBLE ABSEN
+    if (idLock) return alert("ANDA SUDAH ABSEN HARI INI!");
+    if (shiftLock) return alert(`SHIFT ${n} DI ${singkatan(cab).toUpperCase()} SUDAH TERISI!`);
+    // --- END TRIPLE LOCK LOGIC ---
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
         const dist = getDistance(pos.coords.latitude, pos.coords.longitude, CABANG[cab].lat, CABANG[cab].lng);
