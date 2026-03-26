@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  
-  <title>Kopi Setengah-4 v103 - Official App</title>
+  <title>Kopi Setengah-4 v104 - High Security</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,302 +15,235 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
-    body { background-color: #0f172a; color: white; min-height: 100vh; margin: 0; overflow-x: hidden; }
+    body { background-color: #0f172a; color: white; min-height: 100vh; margin: 0; }
     .container-mobile { width: 100%; max-width: 450px; margin: 0 auto; padding: 15px; }
-    .card-v103 { background: #1e293b; border-radius: 18px; padding: 20px; border: 1px solid #334155; margin-bottom: 15px; transition: 0.3s; }
-    .field-v103 { background: #fff !important; color: #0f172a !important; width: 100%; border-radius: 12px; font-weight: 700; height: 48px; text-align: center; border: 2px solid #c29851; font-size: 13px; margin-bottom: 10px; outline: none; }
+    .card-v104 { background: #1e293b; border-radius: 18px; padding: 20px; border: 1px solid #334155; margin-bottom: 15px; }
+    .field-v104 { background: #fff !important; color: #0f172a !important; width: 100%; border-radius: 12px; font-weight: 700; height: 50px; text-align: center; border: 2px solid #c29851; font-size: 14px; margin-bottom: 10px; outline: none; }
     .btn-full { width: 100%; display: flex; align-items: center; justify-content: center; border-radius: 14px; font-weight: 800; height: 55px; text-transform: uppercase; cursor: pointer; transition: 0.2s; border: none; }
     .btn-green { background: #22c55e; color: #052e16; box-shadow: 0 4px 0 #15803d; }
     .btn-green:active { transform: translateY(4px); box-shadow: none; }
-    .btn-bulanan { background: #c29851; color: #000; font-size: 12px; height: 45px; margin-top: 10px; }
     
-    /* Tables */
     .table-box { background: #0f172a; border-radius: 14px; overflow-x: auto; border: 1px solid #334155; }
-    .table-v103 { width: 100%; border-collapse: collapse; min-width: 420px; }
-    .table-v103 th { background: #1e293b; color: #c29851; padding: 14px 6px; font-size: 8px; text-transform: uppercase; letter-spacing: 1px; }
-    .table-v103 td { padding: 12px 6px; font-size: 10px; border-bottom: 1px solid #334155; text-align: center; }
-    .lbl { padding: 4px 8px; border-radius: 6px; font-size: 8px; font-weight: 900; color: white; }
+    .table-v104 { width: 100%; border-collapse: collapse; min-width: 450px; }
+    .table-v104 th { background: #1e293b; color: #c29851; padding: 12px 4px; font-size: 8px; text-transform: uppercase; }
+    .table-v104 td { padding: 10px 4px; font-size: 9px; border-bottom: 1px solid #334155; text-align: center; }
+    .lbl { padding: 3px 6px; border-radius: 4px; font-size: 7px; font-weight: 800; color: white; }
     .lbl-sukses { background: #16a34a; } .lbl-telat { background: #dc2626; }
-    
-    /* Overlay Rekap */
-    #previewPage { background: #f1f5f9; color: #0f172a; min-height: 100vh; padding: 15px; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; overflow-y: auto; }
-    .report-paper { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-    .table-pro { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 9px; }
-    .table-pro th { background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 4px; }
-    .table-pro td { border: 1px solid #cbd5e1; padding: 8px 4px; text-align: center; }
     .hidden { display: none !important; }
   </style>
 </head>
 <body class="flex justify-center">
 
 <div class="container-mobile">
-  <div id="home" class="py-16 text-center">
-    <div class="mb-10">
-        <h1 class="text-4xl font-black text-[#c29851] italic tracking-tighter leading-none">KOPI SETENGAH-4</h1>
-        <p class="text-slate-500 text-[10px] mt-2 font-bold tracking-[0.3em] uppercase">Digital Attendance v103</p>
-    </div>
-    <div class="card-v103">
-        <button onclick="nav('karyawan')" class="btn-full btn-green mb-5">ABSEN MASUK</button>
-        <button onclick="nav('admin')" class="btn-full bg-slate-700 text-slate-300 text-sm">PANEL ADMINISTRATOR</button>
-    </div>
-  </div>
-
-  <div id="admin" class="hidden">
-    <button onclick="nav('home')" class="mb-6 text-slate-500 font-black text-xs uppercase tracking-widest"><i class="fa fa-chevron-left mr-2"></i> Kembali</button>
-    <div class="card-v103">
-        <h2 class="text-center text-[#c29851] font-black mb-8 uppercase tracking-widest">Verifikasi Admin</h2>
-        <input id="passAdmin" type="password" placeholder="PIN KEAMANAN" class="field-v103">
-        <button onclick="loginAdmin()" class="btn-full btn-green">Buka Dashboard</button>
-    </div>
-  </div>
-
-  <div id="dashboard" class="hidden pb-24">
-    <div class="flex justify-between items-center py-4 border-b border-slate-800 mb-6">
-      <div>
-          <h2 class="font-black text-[#c29851] text-xs uppercase tracking-widest">Main Dashboard</h2>
-          <p id="appVer" class="text-[8px] text-slate-500 font-bold uppercase"></p>
-      </div>
-      <button onclick="nav('home')" class="bg-red-500/10 text-red-500 px-4 py-2 rounded-xl font-black text-[9px] uppercase tracking-wider">Keluar</button>
-    </div>
-
-    <div class="card-v103">
-        <p class="text-[10px] font-black text-slate-400 mb-4 uppercase text-center italic">Arsip Laporan Bulanan</p>
-        <div class="grid grid-cols-2 gap-3">
-            <select id="fBulan" class="field-v103 !mb-0"></select>
-            <select id="fTahun" class="field-v103 !mb-0"></select>
-        </div>
-        <button onclick="openRekap()" class="btn-full btn-bulanan">LIHAT DATA REKAP</button>
-    </div>
-
-    <div class="card-v103 !p-3">
-      <div class="grid grid-cols-2 gap-2 mb-4">
-        <select id="selCab" onchange="renderAll()" class="field-v103 !h-[40px] !mb-0 !text-[10px]"></select>
-        <input type="date" id="selTgl" onchange="renderAll()" class="field-v103 !h-[40px] !mb-0 !text-[10px]">
-      </div>
-      <div class="table-box">
-        <table class="table-v103">
-            <thead><tr><th>NAMA</th><th>MAPS</th><th>CABANG</th><th>JAM</th><th>KET</th></tr></thead>
-            <tbody id="tBodyHarian"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card-v103">
-        <h3 class="text-[10px] font-black text-[#c29851] mb-6 uppercase text-center border-b border-slate-700 pb-3">Statistik Keterlambatan</h3>
-        <div class="space-y-10">
-            <div class="h-[180px]">
-                <p class="text-[9px] text-blue-400 mb-3 font-bold uppercase text-center">--- Shift 1 (Pagi) ---</p>
-                <canvas id="chartS1"></canvas>
-            </div>
-            <div class="h-[180px]">
-                <p class="text-[9px] text-orange-400 mb-3 font-bold uppercase text-center">--- Shift 2 (Siang/Sore) ---</p>
-                <canvas id="chartS2"></canvas>
-            </div>
-        </div>
-    </div>
-  </div>
-
-  <div id="previewPage" class="hidden">
-    <div class="flex justify-between items-center mb-6">
-        <button onclick="nav('dashboard')" class="text-slate-600 font-black text-[10px] uppercase">← DASHBOARD</button>
-        <button onclick="generatePDF()" class="bg-green-600 text-white px-5 py-2 rounded-lg font-black text-[10px] uppercase">Download PDF</button>
-    </div>
-    <div class="report-paper">
-        <h1 class="text-center font-black text-[12px] uppercase mb-1">Kopi Setengah-4</h1>
-        <p class="text-center text-[8px] text-slate-500 uppercase font-bold border-b border-slate-300 pb-2 mb-4">Laporan Kehadiran Karyawan</p>
-        <p id="periodTxt" class="text-center text-[10px] font-black mb-4 uppercase"></p>
-        <table id="tablePDF" class="table-pro">
-            <thead><tr><th>TGL</th><th>NAMA</th><th>CABANG</th><th>JAM</th><th>ABSEN</th><th>TELAT</th></tr></thead>
-            <tbody id="rekapBody"></tbody>
-            <tfoot id="rekapFooter"></tfoot>
-        </table>
+  <div id="home" class="py-20 text-center">
+    <h1 class="text-4xl font-black text-[#c29851] italic tracking-tighter mb-10">KOPI SETENGAH-4</h1>
+    <div class="card-v104">
+        <button onclick="nav('karyawan')" class="btn-full btn-green mb-5">ABSEN SEKARANG</button>
+        <button onclick="nav('admin')" class="btn-full bg-slate-700 text-slate-300">ADMIN PANEL</button>
     </div>
   </div>
 
   <div id="karyawan" class="hidden">
-    <button onclick="nav('home')" class="mb-6 text-slate-500 font-black text-xs uppercase tracking-widest"><i class="fa fa-chevron-left mr-2"></i> Kembali</button>
-    <div class="card-v103 text-center">
-        <h2 class="text-[#c29851] font-black mb-8 uppercase tracking-widest">Login Karyawan</h2>
-        <input id="inputID" type="text" placeholder="ID KARYAWAN" class="field-v103">
-        <button onclick="prosesLoginID()" class="btn-full btn-green">Masuk Sistem</button>
+    <div class="card-v104 text-center">
+        <h2 class="text-[#c29851] font-black mb-6 uppercase">ID Verification</h2>
+        <input id="inputID" type="text" placeholder="MASUKKAN ID ANDA" class="field-v104">
+        <button onclick="prosesLoginID()" class="btn-full btn-green">MULAI ABSEN</button>
+        <button onclick="nav('home')" class="mt-4 text-xs text-slate-500 font-bold uppercase">Batal</button>
     </div>
   </div>
 
   <div id="formAbsen" class="hidden">
-    <div class="card-v103">
-        <h2 id="userDisplay" class="text-center text-[#c29851] font-black text-xl mb-8 uppercase"></h2>
-        <p class="text-[9px] font-bold text-slate-500 mb-2 uppercase text-center italic">Pilih Cabang & Shift</p>
-        <select id="selCabAbsen" class="field-v103" onchange="updateShiftList()"></select>
-        <div id="listShift" class="grid grid-cols-1 gap-3"></div>
-        <div id="actionArea" class="hidden mt-10 border-t border-slate-700 pt-8">
-            <button id="btnKirim" class="btn-full btn-green">KONFIRMASI ABSENSI</button>
+    <div class="card-v104">
+        <h2 id="userDisplay" class="text-center text-[#c29851] font-black text-xl mb-4"></h2>
+        <p class="text-center text-[10px] text-slate-400 mb-6 font-bold uppercase tracking-widest">Pilih Lokasi Cabang</p>
+        <select id="selCabAbsen" class="field-v104" onchange="updateShiftList()"></select>
+        <div id="listShift" class="space-y-3"></div>
+        <div id="actionArea" class="hidden mt-8 border-t border-slate-700 pt-6">
+            <button id="btnKirim" class="btn-full btn-green">KONFIRMASI KEHADIRAN</button>
         </div>
-        <button onclick="nav('home')" class="w-full text-slate-500 font-bold text-[10px] mt-8 uppercase tracking-widest">Batalkan</button>
     </div>
   </div>
+
+  <div id="dashboard" class="hidden pb-20">
+    <div class="flex justify-between items-center py-4 mb-4">
+      <h2 class="font-black text-[#c29851] text-xs">MONITORING SYSTEM v104</h2>
+      <button onclick="nav('home')" class="text-red-500 font-bold text-[10px]">LOGOUT</button>
+    </div>
+
+    <div class="card-v104 !p-2">
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <select id="selCab" onchange="renderAll()" class="field-v104 !h-[35px] !mb-0 !text-[10px]"></select>
+        <input type="date" id="selTgl" onchange="renderAll()" class="field-v104 !h-[35px] !mb-0 !text-[10px]">
+      </div>
+      <div class="table-box">
+        <table class="table-v104">
+            <thead><tr><th>NAMA</th><th>CAB</th><th>WAKTU</th><th>DEVICE ID</th><th>KET</th></tr></thead>
+            <tbody id="tBodyHarian"></tbody>
+        </table>
+      </div>
+    </div>
+    </div>
+
+  <div id="admin" class="hidden"><div class="card-v104 text-center"><input id="passAdmin" type="password" placeholder="PIN" class="field-v104"><button onclick="loginAdmin()" class="btn-full btn-green">LOGIN</button></div></div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, push, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, onValue, push, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-const APP_VERSION = "v103.0.1";
 const firebaseConfig = { apiKey: "AIzaSyChFAEgzpZac2yRvkb9r8f0kFT_j_ji1AA", authDomain: "absensi-kopi-setengah-4.firebaseapp.com", databaseURL: "https://absensi-kopi-setengah-4-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "absensi-kopi-setengah-4" };
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
+// KOORDINAT CABANG (Tambahkan lat/lng asli untuk akurasi radius)
+const lokasiCabang = { 
+    "Pondok Indah": { lat: -6.2697, lng: 106.7821, s1: 8 }, 
+    "Menteng": { lat: -6.1912, lng: 106.8229, s1: 8 }, 
+    "Cempaka Putih": { lat: -6.1755, lng: 106.8722, s1: 9 }, 
+    "Tanjung Duren": { lat: -6.1746, lng: 106.7901, s1: 8, s2: 15 }, 
+    "Otista": { lat: -6.2415, lng: 106.8694, s1: 8, s2: 15 }, 
+    "Kebon Jeruk": { lat: -6.1925, lng: 106.7698, s1: 8, s2: 14 } 
+};
+
 const masterKaryawan = { "KS4-1902": "Adryan", "KS4-7721": "Riki", "KS4-3384": "Acong", "KS4-5510": "Oji", "KS4-8892": "David", "KS4-2104": "Fikri", "KS4-6637": "Rizki", "KS4-4429": "Kimoy", "KS4-9012": "Apin" };
-const lokasiCabang = { "Pondok Indah": {s1:8}, "Menteng": {s1:8}, "Cempaka Putih": {s1:9}, "Tanjung Duren": {s1:8,s2:15}, "Otista": {s1:8,s2:15}, "Kebon Jeruk": {s1:8,s2:14} };
-let logs = []; let cS1 = null, cS2 = null; let currentUser = null;
+let currentUser = null; let logs = [];
 
-// NAVIGASI DENGAN FORCE REPAINT
-window.nav = (id) => {
-    ['home', 'admin', 'dashboard', 'previewPage', 'karyawan', 'formAbsen'].forEach(p => document.getElementById(p).classList.add('hidden'));
-    const target = document.getElementById(id);
-    target.classList.remove('hidden');
-    if(id === 'dashboard') {
-        document.getElementById('appVer').innerText = APP_VERSION;
-        startSync(); 
-        setTimeout(updateCharts, 500);
+// GENERATE DEVICE FINGERPRINT (Simple version)
+const getDeviceID = () => {
+    let id = localStorage.getItem('ks4_device_token');
+    if(!id) {
+        id = 'DEV-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        localStorage.setItem('ks4_device_token', id);
     }
+    return id;
 };
 
-// SYNC REALTIME
-function startSync() {
-    onValue(ref(db, 'absensi'), (snap) => {
-        logs = [];
-        if(snap.exists()) {
-            Object.values(snap.val()).forEach(d => {
-                const dt = d.timestamp ? new Date(d.timestamp) : new Date();
-                logs.push({...d, dt, iso: dt.toISOString().split('T')[0]});
-            });
-        }
-        renderAll();
-        if(!document.getElementById('dashboard').classList.contains('hidden')) updateCharts();
-    });
+// HITUNG JARAK (Haversine Formula)
+function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371e3; // metres
+    const φ1 = lat1 * Math.PI/180;
+    const φ2 = lat2 * Math.PI/180;
+    const Δφ = (lat2-lat1) * Math.PI/180;
+    const Δλ = (lon2-lon1) * Math.PI/180;
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// RENDER TABEL HARIAN
-window.renderAll = () => {
-    const cab = document.getElementById('selCab').value || 'Semua';
-    const tgl = document.getElementById('selTgl').value || new Date().toISOString().split('T')[0];
-    const body = document.getElementById('tBodyHarian');
-    if(!body) return;
-    body.innerHTML = '';
-    
-    logs.filter(d => (cab === 'Semua' || d.cabang === cab) && d.iso === tgl).forEach(d => {
-        body.innerHTML += `<tr>
-            <td class="font-bold text-left pl-3 text-white">${d.nama}</td>
-            <td><a href="https://www.google.com/maps?q=${d.lat},${d.lng}" target="_blank" class="text-blue-400">📍</a></td>
-            <td>${d.cabang.split(' ')[0]}</td>
-            <td class="font-mono text-[9px]">${d.waktu}</td>
-            <td><span class="lbl ${d.ket==='TELAT'?'lbl-telat':'lbl-sukses'}">${d.ket}</span></td>
-        </tr>`;
-    });
+window.nav = (id) => {
+    document.querySelectorAll('.container-mobile > div').forEach(d => d.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    if(id === 'dashboard') startSync();
 };
 
-// RENDER ANALISA GRAFIK
-function updateCharts() {
-    const ctx1 = document.getElementById('chartS1');
-    const ctx2 = document.getElementById('chartS2');
-    if(!ctx1 || !ctx2) return;
-
-    const labels = Object.keys(lokasiCabang).map(c => c.split(' ')[0]);
-    const d1 = Object.keys(lokasiCabang).map(c => logs.filter(l => l.cabang === c && l.ket === 'TELAT' && (l.shift === 1 || !l.shift)).length);
-    const d2 = Object.keys(lokasiCabang).map(c => logs.filter(l => l.cabang === c && l.ket === 'TELAT' && l.shift === 2).length);
-
-    const config = (data, color) => ({
-        type: 'bar',
-        data: { labels, datasets: [{ data, backgroundColor: color, borderRadius: 6 }] },
-        options: { 
-            maintainAspectRatio: false, 
-            scales: { 
-                y: { beginAtZero: true, ticks: { color: '#64748b', font: { size: 10 } }, grid: { color: '#334155' } },
-                x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { display: false } }
-            },
-            plugins: { legend: { display: false } } 
-        }
-    });
-
-    if(cS1) cS1.destroy(); cS1 = new Chart(ctx1, config(d1, '#3b82f6'));
-    if(cS2) cS2.destroy(); cS2 = new Chart(ctx2, config(d2, '#f59e0b'));
-}
-
-// REKAP BULANAN
-window.openRekap = () => {
-    const b = parseInt(document.getElementById('fBulan').value);
-    const t = parseInt(document.getElementById('fTahun').value);
-    const data = logs.filter(d => d.dt.getMonth() === b && d.dt.getFullYear() === t).sort((a,b) => a.dt - b.dt);
-    
-    if(data.length === 0) return alert("Ups! Data untuk periode ini masih kosong.");
-    
-    nav('previewPage');
-    const bName = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-    document.getElementById('periodTxt').innerText = `${bName[b].toUpperCase()} ${t}`;
-    
-    const body = document.getElementById('rekapBody'); body.innerHTML = '';
-    let tA = 0, tT = 0;
-    
-    data.forEach(d => {
-        const isL = d.ket === 'TELAT' ? 1 : 0; tA++; tT += isL;
-        body.innerHTML += `<tr><td>${d.tanggal.split('/')[0]}/${d.tanggal.split('/')[1]}</td><td class="text-left font-bold pl-2">${d.nama}</td><td>${d.cabang.split(' ')[0]}</td><td>${d.waktu}</td><td>1</td><td>${isL}</td></tr>`;
-    });
-    document.getElementById('rekapFooter').innerHTML = `<tr class="bg-slate-100 font-bold"><td colspan="4" class="text-right pr-4">TOTAL</td><td>${tA}</td><td>${tT}</td></tr>`;
-};
-
-window.generatePDF = () => {
-    const { jsPDF } = window.jspdf; const doc = new jsPDF();
-    doc.setFontSize(14); doc.text("LAPORAN REKAP ABSENSI - KOPI SETENGAH-4", 105, 15, { align: 'center' });
-    doc.autoTable({ html: '#tablePDF', startY: 25, theme: 'grid', headStyles: { fillColor: [30, 41, 59] }, styles: { fontSize: 8 } });
-    doc.save(`Rekap_Kehadiran_${Date.now()}.pdf`);
-};
-
-// LOGIN & ABSEN
-window.loginAdmin = () => { if(document.getElementById('passAdmin').value === 'setengah-4all') nav('dashboard'); else alert("PIN Salah!"); };
-window.prosesLoginID = () => {
+// LOGIN & DEVICE CHECK
+window.prosesLoginID = async () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
-    if(masterKaryawan[id]) { currentUser = { id, nama: masterKaryawan[id] }; nav('formAbsen'); document.getElementById('userDisplay').innerText = currentUser.nama; buildCabangAbsen(); }
-    else alert("ID Karyawan Tidak Ditemukan!");
+    if(!masterKaryawan[id]) return alert("ID TIDAK VALID!");
+
+    const deviceID = getDeviceID();
+    const userRef = ref(db, `users/${id}`);
+    const snapshot = await get(userRef);
+
+    if(snapshot.exists()) {
+        if(snapshot.val().deviceID !== deviceID) {
+            alert("DITOLAK! ID ini sudah terdaftar di HP lain. Dilarang titip absen!");
+            nav('home'); return;
+        }
+    } else {
+        await set(userRef, { nama: masterKaryawan[id], deviceID: deviceID });
+    }
+
+    currentUser = { id, nama: masterKaryawan[id], deviceID };
+    document.getElementById('userDisplay').innerText = currentUser.nama;
+    nav('formAbsen');
+    buildCabangAbsen();
 };
+
 function buildCabangAbsen() {
-    const s = document.getElementById('selCabAbsen'); s.innerHTML = '<option value="">-- CABANG LOKASI --</option>';
+    const s = document.getElementById('selCabAbsen');
+    s.innerHTML = '<option value="">-- LOKASI CABANG --</option>';
     Object.keys(lokasiCabang).forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
 }
+
 window.updateShiftList = () => {
     const c = document.getElementById('selCabAbsen').value;
     const l = document.getElementById('listShift'); l.innerHTML = '';
     if(!c) return;
     const s = lokasiCabang[c].s2 ? [1,2] : [1];
     s.forEach(n => {
-        const btn = document.createElement('button');
-        btn.className = "btn-full bg-slate-700 text-slate-300 text-sm";
-        btn.innerText = `Shift ${n}`;
-        btn.onclick = () => {
-            document.querySelectorAll('#listShift button').forEach(b => b.classList.remove('btn-green', 'text-white'));
-            btn.classList.add('btn-green', 'text-white');
-            window.finalShift = { c, n };
-            document.getElementById('actionArea').classList.remove('hidden');
-        };
-        l.appendChild(btn);
+        l.innerHTML += `<button onclick="window.finalShift={c:'${c}',n:${n}}; document.getElementById('actionArea').classList.remove('hidden');" class="btn-full bg-slate-700 text-sm text-white mb-2">Shift ${n}</button>`;
     });
 };
-document.getElementById('btnKirim').onclick = () => {
-    navigator.geolocation.getCurrentPosition(p => {
-        const { c, n } = window.finalShift; const now = new Date(); const lim = lokasiCabang[c]['s'+n];
+
+// KIRIM ABSEN DENGAN VALIDASI RADIUS & HARIAN
+document.getElementById('btnKirim').onclick = async () => {
+    const today = new Date().toLocaleDateString('id-ID');
+    
+    // 1. Cek Apakah sudah absen hari ini
+    const logSnap = await get(ref(db, 'absensi'));
+    let sudahAbsen = false;
+    if(logSnap.exists()) {
+        Object.values(logSnap.val()).forEach(log => {
+            if(log.nama === currentUser.nama && log.tanggal === today) sudahAbsen = true;
+        });
+    }
+
+    if(sudahAbsen) {
+        alert("DITOLAK! Anda sudah absen hari ini.");
+        nav('home'); return;
+    }
+
+    // 2. Cek Geofencing (200m)
+    navigator.geolocation.getCurrentPosition((pos) => {
+        const { c, n } = window.finalShift;
+        const dist = getDistance(pos.coords.latitude, pos.coords.longitude, lokasiCabang[c].lat, lokasiCabang[c].lng);
+
+        if(dist > 200) {
+            alert(`DITOLAK! Jarak Anda ${Math.round(dist)}m dari cabang. Harus dalam radius 200m!`);
+            nav('home'); return;
+        }
+
+        const now = new Date();
+        const lim = lokasiCabang[c]['s'+n];
         const st = (now.getHours() > lim || (now.getHours() === lim && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
-        set(push(ref(db, 'absensi')), { nama: currentUser.nama, cabang: c, shift: n, tanggal: now.toLocaleDateString('id-ID'), waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}), ket: st, lat: p.coords.latitude, lng: p.coords.longitude, timestamp: serverTimestamp() });
-        alert("Absen Berhasil Disimpan!"); nav('home');
-    }, () => alert("Gagal mendapatkan lokasi. Pastikan GPS aktif!"));
+
+        set(push(ref(db, 'absensi')), {
+            nama: currentUser.nama, cabang: c, shift: n, tanggal: today,
+            waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}),
+            ket: st, deviceId: currentUser.deviceID, lat: pos.coords.latitude, lng: pos.coords.longitude,
+            timestamp: serverTimestamp()
+        }).then(() => {
+            alert("BERHASIL! Absen telah tercatat.");
+            nav('home');
+        });
+
+    }, () => alert("Gagal mendapatkan lokasi. GPS WAJIB AKTIF!"));
 };
 
-// SETUP AWAL
-const bNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-bNames.forEach((m, i) => document.getElementById('fBulan').innerHTML += `<option value="${i}">${m}</option>`);
-[2025, 2026, 2027].forEach(y => document.getElementById('fTahun').innerHTML += `<option value="${y}">${y}</option>`);
-const n = new Date(); document.getElementById('fBulan').value = n.getMonth(); document.getElementById('fTahun').value = n.getFullYear();
+// SYNC ADMIN & RENDER
+function startSync() {
+    onValue(ref(db, 'absensi'), (snap) => {
+        logs = [];
+        if(snap.exists()) Object.values(snap.val()).forEach(d => logs.push({...d, iso: new Date(d.timestamp).toISOString().split('T')[0]}));
+        renderAll();
+    });
+}
+
+window.renderAll = () => {
+    const c = document.getElementById('selCab').value || 'Semua';
+    const t = document.getElementById('selTgl').value || new Date().toISOString().split('T')[0];
+    const body = document.getElementById('tBodyHarian'); if(!body) return;
+    body.innerHTML = '';
+    logs.filter(l => (c === 'Semua' || l.cabang === c) && l.iso === t).forEach(l => {
+        body.innerHTML += `<tr><td class="font-bold">${l.nama}</td><td>${l.cabang.split(' ')[0]}</td><td>${l.waktu}</td><td class="text-slate-500">${l.deviceId}</td><td><span class="lbl ${l.ket==='TELAT'?'lbl-telat':'lbl-sukses'}">${l.ket}</span></td></tr>`;
+    });
+};
+
+window.loginAdmin = () => { if(document.getElementById('passAdmin').value === 'setengah-4all') nav('dashboard'); else alert("Salah PIN!"); };
+// Setup Awal Dropdown
 const scA = document.getElementById('selCab'); scA.innerHTML = '<option value="Semua">SEMUA CABANG</option>';
 Object.keys(lokasiCabang).forEach(c => scA.innerHTML += `<option value="${c}">${c}</option>`);
-document.getElementById('selTgl').value = n.toISOString().split('T')[0];
+document.getElementById('selTgl').value = new Date().toISOString().split('T')[0];
 </script>
 </body>
-</html>
+  </html>
