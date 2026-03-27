@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v140 - Maps Fixed</title>
+  <title>Kopi Setengah-4 v141 - HTTP/HTTPS Fixed</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -107,12 +107,7 @@
 
     <div class="glass-card !p-2">
         <p class="text-[10px] text-red-500 font-bold mb-3 uppercase text-center">Device Manager</p>
-        <div class="table-wrapper">
-            <table class="pro-table">
-                <thead><tr><th style="width:40%">NAMA</th><th style="width:30%">ID HP</th><th style="width:30%">AKSI</th></tr></thead>
-                <tbody id="tBodyDevice"></tbody>
-            </table>
-        </div>
+        <div class="table-wrapper"><table class="pro-table"><thead><tr><th style="width:40%">NAMA</th><th style="width:30%">ID HP</th><th style="width:30%">AKSI</th></tr></thead><tbody id="tBodyDevice"></tbody></table></div>
     </div>
   </div>
 
@@ -216,26 +211,24 @@ function startSync() {
 
 window.resetD = async (id) => { if(confirm("Reset?")) await remove(ref(db, `locks/${id}`)); };
 
-// PERBAIKAN UTAMA: MENGGUNAKAN GEO: INTENT UNTUK ANDROID
 window.renderAll = () => {
     const b = document.getElementById('tBodyHarian');
     const t = document.getElementById('selTgl').value || new Date().toLocaleDateString('en-CA');
     const target = new Date(t).toLocaleDateString('id-ID');
     const cf = document.getElementById('selCab').value; b.innerHTML = '';
     logs.filter(l => l.tanggal === target && (cf==='Semua' || l.cabang===cf)).forEach(l => {
-        // Link dimodifikasi agar memicu aplikasi Maps asli
-        // Ganti baris yang ada di dalam b.innerHTML (bagian renderAll) dengan ini:
-const mapsUrl = `intent://maps.google.com/maps?daddr=${l.lat},${l.lng}&amp;ll=#Intent;scheme=http;package=com.google.android.apps.maps;end`;
-
-b.innerHTML += `<tr>
-    <td class="font-bold text-white uppercase">${l.nama}</td>
-    <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
-    <td>${l.waktu}</td>
-    <td>
-        <a href="${mapsUrl}" class="text-[12px]">📍</a>
-    </td>
-    <td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td>
-</tr>`;
+        // PERBAIKAN: Link HTTPS standar untuk membuka aplikasi Maps luar
+        const mapsUrl = `http://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}`;
+        
+        b.innerHTML += `<tr>
+            <td class="font-bold text-white uppercase">${l.nama}</td>
+            <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
+            <td>${l.waktu}</td>
+            <td>
+                <a href="${mapsUrl}" target="_blank" class="text-[12px]">📍</a>
+            </td>
+            <td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td>
+        </tr>`;
     });
 };
 
