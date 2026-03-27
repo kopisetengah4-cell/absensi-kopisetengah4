@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v138 - Branch Separated Report</title>
+  <title>Kopi Setengah-4 v140 - Maps Fixed</title>
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -16,21 +20,18 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Plus Jakarta Sans', sans-serif; }
     body { background-color: var(--dark-bg); color: #f8fafc; margin: 0; overflow-x: hidden; width: 100vw; }
     .main-container { width: 94%; margin: 0 auto; padding: 15px 0; position: relative; }
-    
     .btn-back-global { position: absolute; top: 0; left: 0; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; display: flex; align-items: center; gap: 5px; padding: 5px 0; z-index: 50; }
     .glass-card { background: var(--card-bg); border-radius: 16px; padding: 18px; border: 1px solid var(--border); margin-bottom: 20px; }
-    
     .btn-pro { width: 100%; height: 52px; border-radius: 12px; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; justify-content: center; font-size: 13px; border: none; }
     .btn-gold { background: var(--gold); color: #000; box-shadow: 0 4px 0 #8e6d35; }
     .btn-dark { background: #334155; color: #cbd5e1; border: 1px solid #475569; }
     .input-pro { background: #fff !important; color: #000 !important; width: 100%; border-radius: 10px; font-weight: 700; height: 44px; text-align: center; border: 2px solid var(--gold); outline: none; font-size: 12px; }
-    
     .table-wrapper { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); background: #0f172a; }
     .pro-table { width: 100%; table-layout: fixed; border-collapse: collapse; }
     .pro-table th { background: #1e293b; color: var(--gold); font-size: 7px; padding: 12px 1px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
     .pro-table td { font-size: 8px; padding: 12px 1px; border-bottom: 1px solid var(--border); text-align: center; color: #cbd5e1; vertical-align: middle; }
     .hidden { display: none !important; }
-
+    .btn-active-shift { border: 2px solid #fff !important; background: #16a34a !important; color: white !important; }
     #reportOverlay { background: #f1f5f9; position: fixed; inset: 0; z-index: 2000; padding: 20px; overflow-y: auto; color: #1e293b; }
     .branch-section { background: white; border-radius: 12px; padding: 15px; margin-bottom: 25px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
     .branch-title { font-size: 14px; font-weight: 800; color: #1e293b; border-bottom: 2px solid #c29851; padding-bottom: 5px; margin-bottom: 12px; display: inline-block; }
@@ -141,22 +142,11 @@ const db = getDatabase(app);
 const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin" };
 const CABANG = { "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9} };
 
-const singkatan = (n) => {
-    if(n === "Tanjung Duren") return "Tandur";
-    if(n === "Cempaka Putih") return "Cemput";
-    if(n === "Pondok Indah") return "P.Indah";
-    if(n === "Kebon Jeruk") return "Jl.Panjang";
-    return n;
-};
-
+const singkatan = (n) => { if(n === "Tanjung Duren") return "Tandur"; if(n === "Cempaka Putih") return "Cemput"; if(n === "Pondok Indah") return "P.Indah"; if(n === "Kebon Jeruk") return "Jl.Panjang"; return n; };
 const DEVID = localStorage.getItem('ks4_devid') || localStorage.setItem('ks4_devid', 'DEV-'+Math.random().toString(36).substr(2,9).toUpperCase()) || localStorage.getItem('ks4_devid');
 let logs = []; let uData = null; window.pnd = null; let groupedData = {};
 
-window.nav = (id) => {
-    document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-    if(id==='dashboard') startSync();
-};
+window.nav = (id) => { document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id==='dashboard') startSync(); };
 
 window.prosesLogin = async () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
@@ -171,8 +161,7 @@ window.prosesLogin = async () => {
 
 window.updateShiftUI = () => {
     const c = document.getElementById('selCabAbsen').value;
-    const g = document.getElementById('shiftGrid'); g.innerHTML = '';
-    if(!c) return;
+    const g = document.getElementById('shiftGrid'); g.innerHTML = ''; if(!c) return;
     const ss = CABANG[c].s2 ? [1,2] : [1];
     ss.forEach(n => g.innerHTML += `<button onclick="selS(this, '${c}', ${n})" class="btn-pro btn-dark btn-shift-item">SHIFT ${n}</button>`);
 };
@@ -192,8 +181,7 @@ document.getElementById('sendBtn').onclick = async () => {
         idL = ad.some(e => e.idKaryawan === uData.id && e.tanggal === today);
         shL = ad.some(e => e.cabang === cab && e.shift === n && e.tanggal === today);
     }
-    if (idL) return alert("SUDAH ABSEN!");
-    if (shL) return alert("SHIFT TERISI!");
+    if (idL) return alert("SUDAH ABSEN!"); if (shL) return alert("SHIFT TERISI!");
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
         const dist = getDistance(pos.coords.latitude, pos.coords.longitude, CABANG[cab].lat, CABANG[cab].lng);
@@ -228,51 +216,45 @@ function startSync() {
 
 window.resetD = async (id) => { if(confirm("Reset?")) await remove(ref(db, `locks/${id}`)); };
 
+// PERBAIKAN UTAMA: MENGGUNAKAN GEO: INTENT UNTUK ANDROID
 window.renderAll = () => {
     const b = document.getElementById('tBodyHarian');
     const t = document.getElementById('selTgl').value || new Date().toLocaleDateString('en-CA');
     const target = new Date(t).toLocaleDateString('id-ID');
-    const cf = document.getElementById('selCab').value;
-    b.innerHTML = '';
+    const cf = document.getElementById('selCab').value; b.innerHTML = '';
     logs.filter(l => l.tanggal === target && (cf==='Semua' || l.cabang===cf)).forEach(l => {
-        b.innerHTML += `<tr><td class="font-bold text-white uppercase">${l.nama}</td><td class="text-gold font-bold">${singkatan(l.cabang)}</td><td>${l.waktu}</td><td><a href="https://www.google.com/maps?q=${l.lat},${l.lng}" target="_blank">📍</a></td><td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td></tr>`;
+        // Link dimodifikasi agar memicu aplikasi Maps asli
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}`;
+        
+        b.innerHTML += `<tr>
+            <td class="font-bold text-white uppercase">${l.nama}</td>
+            <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
+            <td>${l.waktu}</td>
+            <td>
+                <a href="${mapsUrl}" target="_blank" class="text-[12px]">📍</a>
+            </td>
+            <td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td>
+        </tr>`;
     });
 };
 
-// LOGIKA LAPORAN TERPISAH PER CABANG
 window.generateReport = () => {
     const bln = parseInt(document.getElementById('fBulan').value);
     const thn = parseInt(document.getElementById('fTahun').value);
     const ms = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-    
     groupedData = {};
     logs.filter(l => l.dt.getMonth() === bln && l.dt.getFullYear() === thn).forEach(l => {
         if(!groupedData[l.cabang]) groupedData[l.cabang] = {};
         if(!groupedData[l.cabang][l.nama]) groupedData[l.cabang][l.nama] = {nama: l.nama, abs: 0, tlt: 0};
         groupedData[l.cabang][l.nama].abs++; if(l.ket==='TELAT') groupedData[l.cabang][l.nama].tlt++;
     });
-
     document.getElementById('reportTitle').innerText = `Laporan Kehadiran ${ms[bln]} ${thn}`;
-    const container = document.getElementById('branchTablesContainer');
-    container.innerHTML = '';
-
-    if(Object.keys(groupedData).length === 0) {
-        container.innerHTML = '<p class="text-center text-slate-400 py-10">Tidak ada data pada periode ini.</p>';
-    } else {
-        Object.keys(groupedData).sort().forEach(cabName => {
-            let html = `
-            <div class="branch-section">
-                <div class="branch-title">${cabName.toUpperCase()}</div>
-                <table class="white-table">
-                    <thead><tr><th class="text-left">NAMA</th><th>HADIR</th><th>TELAT</th></tr></thead>
-                    <tbody>`;
-            Object.values(groupedData[cabName]).forEach(r => {
-                html += `<tr><td class="text-left font-bold uppercase">${r.nama}</td><td>${r.abs}</td><td class="text-red-600 font-bold">${r.tlt}</td></tr>`;
-            });
-            html += `</tbody></table></div>`;
-            container.innerHTML += html;
-        });
-    }
+    const container = document.getElementById('branchTablesContainer'); container.innerHTML = '';
+    Object.keys(groupedData).sort().forEach(cabName => {
+        let html = `<div class="branch-section"><div class="branch-title">${cabName.toUpperCase()}</div><table class="white-table"><thead><tr><th class="text-left">NAMA</th><th>HADIR</th><th>TELAT</th></tr></thead><tbody>`;
+        Object.values(groupedData[cabName]).forEach(r => { html += `<tr><td class="text-left font-bold uppercase">${r.nama}</td><td>${r.abs}</td><td class="text-red-600 font-bold">${r.tlt}</td></tr>`; });
+        html += `</tbody></table></div>`; container.innerHTML += html;
+    });
     nav('reportOverlay');
 };
 
@@ -281,22 +263,19 @@ window.downloadPDF = () => {
     const title = document.getElementById('reportTitle').innerText;
     doc.setFontSize(18); doc.text("KOPI SETENGAH-4", 105, 20, {align: 'center'});
     doc.setFontSize(11); doc.text(title, 105, 28, {align: 'center'});
-    
     let y = 40;
     Object.keys(groupedData).sort().forEach(cab => {
-        doc.setFontSize(12); doc.setTextColor(194, 152, 81);
-        doc.text(cab.toUpperCase(), 14, y);
-        y += 5;
+        doc.setFontSize(12); doc.setTextColor(194, 152, 81); doc.text(cab.toUpperCase(), 14, y); y += 5;
         const rows = Object.values(groupedData[cab]).map(r => [r.nama, r.abs, r.tlt]);
         doc.autoTable({ startY: y, head: [['NAMA KARYAWAN', 'TOTAL HADIR', 'TOTAL TELAT']], body: rows, theme: 'grid', headStyles: {fillColor: [30, 41, 59]} });
-        y = doc.lastAutoTable.finalY + 15;
-        if(y > 250) { doc.addPage(); y = 20; }
+        y = doc.lastAutoTable.finalY + 15; if(y > 250) { doc.addPage(); y = 20; }
     });
     doc.save(`Laporan_${title.replace(/ /g,'_')}.pdf`);
 };
 
-const ms = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
-ms.forEach((m, i) => document.getElementById('fBulan').innerHTML += `<option value="${i}">${m}</option>`);
+// INITIALIZE
+const msNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+msNames.forEach((m, i) => document.getElementById('fBulan').innerHTML += `<option value="${i}">${m}</option>`);
 [2025, 2026].forEach(y => document.getElementById('fTahun').innerHTML += `<option value="${y}">${y}</option>`);
 document.getElementById('fBulan').value = new Date().getMonth();
 document.getElementById('fTahun').value = new Date().getFullYear();
