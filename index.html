@@ -224,17 +224,18 @@ window.renderAll = () => {
     const cf = document.getElementById('selCab').value; b.innerHTML = '';
     logs.filter(l => l.tanggal === target && (cf==='Semua' || l.cabang===cf)).forEach(l => {
         // Link dimodifikasi agar memicu aplikasi Maps asli
-        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}`;
-        
-        b.innerHTML += `<tr>
-            <td class="font-bold text-white uppercase">${l.nama}</td>
-            <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
-            <td>${l.waktu}</td>
-            <td>
-                <a href="${mapsUrl}" target="_blank" class="text-[12px]">📍</a>
-            </td>
-            <td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td>
-        </tr>`;
+        // Ganti baris yang ada di dalam b.innerHTML (bagian renderAll) dengan ini:
+const mapsUrl = `intent://maps.google.com/maps?daddr=${l.lat},${l.lng}&amp;ll=#Intent;scheme=http;package=com.google.android.apps.maps;end`;
+
+b.innerHTML += `<tr>
+    <td class="font-bold text-white uppercase">${l.nama}</td>
+    <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
+    <td>${l.waktu}</td>
+    <td>
+        <a href="${mapsUrl}" class="text-[12px]">📍</a>
+    </td>
+    <td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td>
+</tr>`;
     });
 };
 
