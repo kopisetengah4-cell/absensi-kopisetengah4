@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v141 - HTTP/HTTPS Fixed</title>
+  <title>Kopi Setengah-4 v142</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -143,12 +143,21 @@ let logs = []; let uData = null; window.pnd = null; let groupedData = {};
 
 window.nav = (id) => { document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id==='dashboard') startSync(); };
 
+// v142: INSTANT DEVICE LOCK PADA LOGIN
 window.prosesLogin = async () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
-    if(!STAFF[id]) return alert("ID SALAH!");
+    if(!STAFF[id]) return alert("ID TIDAK TERDAFTAR!");
     const snapLock = await get(ref(db, `locks/${id}`));
-    if(snapLock.exists() && snapLock.val() !== DEVID) return alert("DEVICE TERKUNCI!");
-    uData = { id, nama: STAFF[id] }; nav('formAbsen');
+    
+    if(!snapLock.exists()) {
+        await set(ref(db, `locks/${id}`), DEVID);
+        alert("DEVICE BERHASIL DIDAFTARKAN!");
+    } else {
+        if(snapLock.val() !== DEVID) return alert("MAAF, ID INI TERKUNCI DI HP LAIN!");
+    }
+
+    uData = { id, nama: STAFF[id] }; 
+    nav('formAbsen');
     document.getElementById('nameGreeting').innerText = uData.nama;
     const s = document.getElementById('selCabAbsen'); s.innerHTML = '<option value="">-- CABANG --</option>';
     Object.keys(CABANG).forEach(c => s.innerHTML += `<option value="${c}">${c}</option>`);
@@ -182,7 +191,6 @@ document.getElementById('sendBtn').onclick = async () => {
         const dist = getDistance(pos.coords.latitude, pos.coords.longitude, CABANG[cab].lat, CABANG[cab].lng);
         if(dist > 0.5) return alert("DI LUAR RADIUS!");
         const now = new Date(); const st = (now.getHours() > CABANG[cab]['s'+n] || (now.getHours() === CABANG[cab]['s'+n] && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
-        await set(ref(db, `locks/${uData.id}`), DEVID);
         await set(push(ref(db, 'absensi')), { idKaryawan: uData.id, nama: uData.nama, cabang: cab, shift: n, tanggal: today, waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}), ket: st, lat: pos.coords.latitude, lng: pos.coords.longitude, timestamp: serverTimestamp() });
         alert("BERHASIL!"); location.reload();
     }, () => alert("GPS OFF"), {enableHighAccuracy: true});
@@ -217,15 +225,15 @@ window.renderAll = () => {
     const target = new Date(t).toLocaleDateString('id-ID');
     const cf = document.getElementById('selCab').value; b.innerHTML = '';
     logs.filter(l => l.tanggal === target && (cf==='Semua' || l.cabang===cf)).forEach(l => {
-        // PERBAIKAN: Link HTTPS standar untuk membuka aplikasi Maps luar
-        const mapsUrl = `http://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}`;
+        // PERBAIKAN: Link Maps Standard (Triggers Maps App)
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}`;
         
         b.innerHTML += `<tr>
             <td class="font-bold text-white uppercase">${l.nama}</td>
             <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
             <td>${l.waktu}</td>
             <td>
-                <a href="${mapsUrl}" target="_blank" class="text-[12px]">📍</a>
+                <a href="${mapsUrl}" target="_blank" style="font-size:12px; text-decoration:none;">📍</a>
             </td>
             <td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td>
         </tr>`;
@@ -267,7 +275,6 @@ window.downloadPDF = () => {
     doc.save(`Laporan_${title.replace(/ /g,'_')}.pdf`);
 };
 
-// INITIALIZE
 const msNames = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
 msNames.forEach((m, i) => document.getElementById('fBulan').innerHTML += `<option value="${i}">${m}</option>`);
 [2025, 2026].forEach(y => document.getElementById('fTahun').innerHTML += `<option value="${y}">${y}</option>`);
