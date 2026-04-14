@@ -56,6 +56,12 @@
     <div class="glass-card">
         <p class="text-[10px] text-gold font-bold mb-4 text-center uppercase">Login Karyawan</p>
         <input id="inputID" placeholder="ID (KS4-XXXX)" class="input-pro">
+        
+        <div class="flex items-center justify-start mt-3 mb-2 px-2">
+            <input type="checkbox" id="remKaryawan" checked class="mr-2 w-4 h-4 accent-[#c29851] cursor-pointer">
+            <label for="remKaryawan" class="text-[11px] font-bold text-slate-300 cursor-pointer">Ingat ID Saya</label>
+        </div>
+
         <button onclick="prosesLogin()" class="btn-pro btn-gold mt-4">MASUK</button>
     </div>
   </div>
@@ -77,6 +83,12 @@
     <div class="glass-card">
         <p class="text-[10px] text-red-500 font-bold mb-4 text-center uppercase">Akses Admin</p>
         <input id="pinAdmin" type="password" placeholder="PIN ADMIN" class="input-pro">
+        
+        <div class="flex items-center justify-start mt-3 mb-2 px-2">
+            <input type="checkbox" id="remAdmin" checked class="mr-2 w-4 h-4 accent-red-500 cursor-pointer">
+            <label for="remAdmin" class="text-[11px] font-bold text-slate-300 cursor-pointer">Ingat PIN Saya</label>
+        </div>
+
         <button onclick="loginAdmin()" class="btn-pro btn-gold mt-4">MASUK PANEL</button>
     </div>
   </div>
@@ -143,10 +155,17 @@ let logs = []; let uData = null; window.pnd = null; let groupedData = {};
 
 window.nav = (id) => { document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id==='dashboard') startSync(); };
 
-// v142: INSTANT DEVICE LOCK PADA LOGIN
 window.prosesLogin = async () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
     if(!STAFF[id]) return alert("ID TIDAK TERDAFTAR!");
+    
+    // Simpan atau Hapus ID dari LocalStorage
+    if(document.getElementById('remKaryawan').checked) {
+        localStorage.setItem('ks4_emp_id', id);
+    } else {
+        localStorage.removeItem('ks4_emp_id');
+    }
+
     const snapLock = await get(ref(db, `locks/${id}`));
     
     if(!snapLock.exists()) {
@@ -202,7 +221,20 @@ function getDistance(lat1, lon1, lat2, lon2) {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-window.loginAdmin = () => { if(document.getElementById('pinAdmin').value==='9812') nav('dashboard'); else alert("SALAH"); };
+window.loginAdmin = () => { 
+    const pin = document.getElementById('pinAdmin').value;
+    if(pin === '9812') {
+        // Simpan atau Hapus PIN dari LocalStorage
+        if(document.getElementById('remAdmin').checked) {
+            localStorage.setItem('ks4_admin_pin', pin);
+        } else {
+            localStorage.removeItem('ks4_admin_pin');
+        }
+        nav('dashboard'); 
+    } else {
+        alert("SALAH"); 
+    }
+};
 
 function startSync() {
     onValue(ref(db, 'absensi'), (snap) => {
@@ -225,16 +257,12 @@ window.renderAll = () => {
     const target = new Date(t).toLocaleDateString('id-ID');
     const cf = document.getElementById('selCab').value; b.innerHTML = '';
     logs.filter(l => l.tanggal === target && (cf==='Semua' || l.cabang===cf)).forEach(l => {
-        // PERBAIKAN: Link Maps Standard (Triggers Maps App)
-        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}`;
-        
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=$${l.lat},${l.lng}`;
         b.innerHTML += `<tr>
             <td class="font-bold text-white uppercase">${l.nama}</td>
             <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
             <td>${l.waktu}</td>
-            <td>
-                <a href="${mapsUrl}" target="_blank" style="font-size:12px; text-decoration:none;">📍</a>
-            </td>
+            <td><a href="${mapsUrl}" target="_blank" style="font-size:12px; text-decoration:none;">📍</a></td>
             <td><span class="px-1 py-0.5 rounded text-[7px] font-black ${l.ket==='TELAT'?'bg-red-600':'bg-green-600'}">${l.ket}</span></td>
         </tr>`;
     });
@@ -283,6 +311,22 @@ document.getElementById('fTahun').value = new Date().getFullYear();
 document.getElementById('selTgl').value = new Date().toLocaleDateString('en-CA');
 const sc = document.getElementById('selCab'); sc.innerHTML = '<option value="Semua">SEMUA CABANG</option>';
 Object.keys(CABANG).forEach(c => sc.innerHTML += `<option value="${c}">${c}</option>`);
+
+// ==========================================
+// CEK REMEMBER ME SAAT APLIKASI DIBUKA
+// ==========================================
+const savedEmpID = localStorage.getItem('ks4_emp_id');
+if (savedEmpID) {
+    document.getElementById('inputID').value = savedEmpID;
+    document.getElementById('remKaryawan').checked = true;
+}
+
+const savedAdminPin = localStorage.getItem('ks4_admin_pin');
+if (savedAdminPin) {
+    document.getElementById('pinAdmin').value = savedAdminPin;
+    document.getElementById('remAdmin').checked = true;
+}
+
 </script>
 </body>
 </html>
