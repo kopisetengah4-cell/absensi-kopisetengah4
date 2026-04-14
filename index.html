@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v142</title>
+  <title>Kopi Setengah-4 v143</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -62,7 +62,7 @@
             <label for="remKaryawan" class="text-[11px] font-bold text-slate-300 cursor-pointer">Ingat ID Saya</label>
         </div>
 
-        <button onclick="prosesLogin()" class="btn-pro btn-gold mt-4">MASUK</button>
+        <button id="btnLoginKaryawan" onclick="prosesLogin()" class="btn-pro btn-gold mt-4">MASUK</button>
     </div>
   </div>
 
@@ -155,6 +155,7 @@ let logs = []; let uData = null; window.pnd = null; let groupedData = {};
 
 window.nav = (id) => { document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id==='dashboard') startSync(); };
 
+// v143: BLOKIR ABSEN GANDA DI PINTU MASUK
 window.prosesLogin = async () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
     if(!STAFF[id]) return alert("ID TIDAK TERDAFTAR!");
@@ -166,15 +167,41 @@ window.prosesLogin = async () => {
         localStorage.removeItem('ks4_emp_id');
     }
 
+    const btn = document.getElementById('btnLoginKaryawan');
+    btn.innerText = "MEMERIKSA DATA...";
+    btn.disabled = true;
+
+    // CEK APAKAH SUDAH ABSEN HARI INI DI CABANG MANAPUN
+    const today = new Date().toLocaleDateString('id-ID');
+    const snapAbsen = await get(ref(db, 'absensi'));
+    
+    if (snapAbsen.exists()) {
+        // Cari data absen milik ID ini pada tanggal hari ini
+        const absenHariIni = Object.values(snapAbsen.val()).find(e => e.idKaryawan === id && e.tanggal === today);
+        
+        if (absenHariIni) {
+            btn.innerText = "MASUK";
+            btn.disabled = false;
+            return alert(`MAAF, ANDA SUDAH ABSEN HARI INI DI CABANG ${absenHariIni.cabang.toUpperCase()}!\nSatu ID hanya bisa absen 1x per hari.`);
+        }
+    }
+
     const snapLock = await get(ref(db, `locks/${id}`));
     
     if(!snapLock.exists()) {
         await set(ref(db, `locks/${id}`), DEVID);
         alert("DEVICE BERHASIL DIDAFTARKAN!");
     } else {
-        if(snapLock.val() !== DEVID) return alert("MAAF, ID INI TERKUNCI DI HP LAIN!");
+        if(snapLock.val() !== DEVID) {
+            btn.innerText = "MASUK";
+            btn.disabled = false;
+            return alert("MAAF, ID INI TERKUNCI DI HP LAIN!");
+        }
     }
 
+    // Jika aman (belum absen & device cocok), lanjut ke form
+    btn.innerText = "MASUK";
+    btn.disabled = false;
     uData = { id, nama: STAFF[id] }; 
     nav('formAbsen');
     document.getElementById('nameGreeting').innerText = uData.nama;
@@ -198,21 +225,24 @@ window.selS = (btn, cab, n) => {
 document.getElementById('sendBtn').onclick = async () => {
     const {cab, n} = window.pnd; const today = new Date().toLocaleDateString('id-ID');
     const snapAll = await get(ref(db, 'absensi'));
+    
+    // Pengecekan lapis kedua untuk keamanan tambahan
     let idL = false; let shL = false;
     if (snapAll.exists()) {
         const ad = Object.values(snapAll.val());
         idL = ad.some(e => e.idKaryawan === uData.id && e.tanggal === today);
         shL = ad.some(e => e.cabang === cab && e.shift === n && e.tanggal === today);
     }
-    if (idL) return alert("SUDAH ABSEN!"); if (shL) return alert("SHIFT TERISI!");
+    if (idL) return alert("SUDAH ABSEN HARI INI!"); 
+    if (shL) return alert("SHIFT TERISI OLEH KARYAWAN LAIN!");
 
     navigator.geolocation.getCurrentPosition(async (pos) => {
         const dist = getDistance(pos.coords.latitude, pos.coords.longitude, CABANG[cab].lat, CABANG[cab].lng);
-        if(dist > 0.5) return alert("DI LUAR RADIUS!");
+        if(dist > 0.5) return alert("DI LUAR RADIUS CABANG!");
         const now = new Date(); const st = (now.getHours() > CABANG[cab]['s'+n] || (now.getHours() === CABANG[cab]['s'+n] && now.getMinutes() > 0)) ? "TELAT" : "TEPAT";
         await set(push(ref(db, 'absensi')), { idKaryawan: uData.id, nama: uData.nama, cabang: cab, shift: n, tanggal: today, waktu: now.toLocaleTimeString('id-ID', {hour:'2-digit',minute:'2-digit'}), ket: st, lat: pos.coords.latitude, lng: pos.coords.longitude, timestamp: serverTimestamp() });
-        alert("BERHASIL!"); location.reload();
-    }, () => alert("GPS OFF"), {enableHighAccuracy: true});
+        alert("ABSEN BERHASIL!"); location.reload();
+    }, () => alert("GPS OFF / TIDAK DIIZINKAN"), {enableHighAccuracy: true});
 };
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -224,7 +254,6 @@ function getDistance(lat1, lon1, lat2, lon2) {
 window.loginAdmin = () => { 
     const pin = document.getElementById('pinAdmin').value;
     if(pin === '9812') {
-        // Simpan atau Hapus PIN dari LocalStorage
         if(document.getElementById('remAdmin').checked) {
             localStorage.setItem('ks4_admin_pin', pin);
         } else {
@@ -232,7 +261,7 @@ window.loginAdmin = () => {
         }
         nav('dashboard'); 
     } else {
-        alert("SALAH"); 
+        alert("PIN SALAH!"); 
     }
 };
 
@@ -249,7 +278,7 @@ function startSync() {
     });
 }
 
-window.resetD = async (id) => { if(confirm("Reset?")) await remove(ref(db, `locks/${id}`)); };
+window.resetD = async (id) => { if(confirm("Reset Device untuk " + (STAFF[id] || id) + "?")) await remove(ref(db, `locks/${id}`)); };
 
 window.renderAll = () => {
     const b = document.getElementById('tBodyHarian');
@@ -312,9 +341,7 @@ document.getElementById('selTgl').value = new Date().toLocaleDateString('en-CA')
 const sc = document.getElementById('selCab'); sc.innerHTML = '<option value="Semua">SEMUA CABANG</option>';
 Object.keys(CABANG).forEach(c => sc.innerHTML += `<option value="${c}">${c}</option>`);
 
-// ==========================================
 // CEK REMEMBER ME SAAT APLIKASI DIBUKA
-// ==========================================
 const savedEmpID = localStorage.getItem('ks4_emp_id');
 if (savedEmpID) {
     document.getElementById('inputID').value = savedEmpID;
