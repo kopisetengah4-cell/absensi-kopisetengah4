@@ -202,7 +202,7 @@ function getDistance(lat1, lon1, lat2, lon2) {
     return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
 }
 
-window.loginAdmin = () => { if(document.getElementById('pinAdmin').value==='setengah-4all') nav('dashboard'); else alert("SALAH"); };
+window.loginAdmin = () => { if(document.getElementById('pinAdmin').value==='9812') nav('dashboard'); else alert("SALAH"); };
 
 function startSync() {
     onValue(ref(db, 'absensi'), (snap) => {
