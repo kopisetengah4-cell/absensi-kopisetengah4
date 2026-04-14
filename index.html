@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v143</title>
+  <title>Kopi Setengah-4 v144</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -155,12 +155,10 @@ let logs = []; let uData = null; window.pnd = null; let groupedData = {};
 
 window.nav = (id) => { document.querySelectorAll('.main-container > div').forEach(d => d.classList.add('hidden')); document.getElementById(id).classList.remove('hidden'); if(id==='dashboard') startSync(); };
 
-// v143: BLOKIR ABSEN GANDA DI PINTU MASUK
 window.prosesLogin = async () => {
     const id = document.getElementById('inputID').value.trim().toUpperCase();
     if(!STAFF[id]) return alert("ID TIDAK TERDAFTAR!");
     
-    // Simpan atau Hapus ID dari LocalStorage
     if(document.getElementById('remKaryawan').checked) {
         localStorage.setItem('ks4_emp_id', id);
     } else {
@@ -171,14 +169,11 @@ window.prosesLogin = async () => {
     btn.innerText = "MEMERIKSA DATA...";
     btn.disabled = true;
 
-    // CEK APAKAH SUDAH ABSEN HARI INI DI CABANG MANAPUN
     const today = new Date().toLocaleDateString('id-ID');
     const snapAbsen = await get(ref(db, 'absensi'));
     
     if (snapAbsen.exists()) {
-        // Cari data absen milik ID ini pada tanggal hari ini
         const absenHariIni = Object.values(snapAbsen.val()).find(e => e.idKaryawan === id && e.tanggal === today);
-        
         if (absenHariIni) {
             btn.innerText = "MASUK";
             btn.disabled = false;
@@ -199,7 +194,6 @@ window.prosesLogin = async () => {
         }
     }
 
-    // Jika aman (belum absen & device cocok), lanjut ke form
     btn.innerText = "MASUK";
     btn.disabled = false;
     uData = { id, nama: STAFF[id] }; 
@@ -226,7 +220,6 @@ document.getElementById('sendBtn').onclick = async () => {
     const {cab, n} = window.pnd; const today = new Date().toLocaleDateString('id-ID');
     const snapAll = await get(ref(db, 'absensi'));
     
-    // Pengecekan lapis kedua untuk keamanan tambahan
     let idL = false; let shL = false;
     if (snapAll.exists()) {
         const ad = Object.values(snapAll.val());
@@ -286,7 +279,8 @@ window.renderAll = () => {
     const target = new Date(t).toLocaleDateString('id-ID');
     const cf = document.getElementById('selCab').value; b.innerHTML = '';
     logs.filter(l => l.tanggal === target && (cf==='Semua' || l.cabang===cf)).forEach(l => {
-        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=$${l.lat},${l.lng}`;
+        // FIX BUG MAPS URL
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}`;
         b.innerHTML += `<tr>
             <td class="font-bold text-white uppercase">${l.nama}</td>
             <td class="text-gold font-bold">${singkatan(l.cabang)}</td>
