@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v144</title>
+  <title>Kopi Setengah-4 v145</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -146,8 +146,19 @@ const firebaseConfig = { apiKey: "AIzaSyChFAEgzpZac2yRvkb9r8f0kFT_j_ji1AA", auth
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin" };
-const CABANG = { "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9} };
+// PEMBARUAN: TAMBAH ID KARYAWAN SUNTER
+const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin", "KS4-8073":"Sunter" };
+
+// PEMBARUAN: TAMBAH CABANG SUNTER DENGAN 2 SHIFT DAN KOORDINAT GPS BARU
+const CABANG = { 
+    "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, 
+    "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, 
+    "Kebon Jeruk": {lat:-6.210859, lng:106.771180, s1:8, s2:14}, 
+    "Pondok Indah": {lat:-6.276248, lng:106.781961, s1:8}, 
+    "Menteng": {lat:-6.194873, lng:106.828777, s1:8}, 
+    "Cempaka Putih": {lat:-6.176458, lng:106.873310, s1:9},
+    "Sunter": {lat:-6.138919, lng:106.876833, s1:8, s2:15} 
+};
 
 const singkatan = (n) => { if(n === "Tanjung Duren") return "Tandur"; if(n === "Cempaka Putih") return "Cemput"; if(n === "Pondok Indah") return "P.Indah"; if(n === "Kebon Jeruk") return "Jl.Panjang"; return n; };
 const DEVID = localStorage.getItem('ks4_devid') || localStorage.setItem('ks4_devid', 'DEV-'+Math.random().toString(36).substr(2,9).toUpperCase()) || localStorage.getItem('ks4_devid');
@@ -279,7 +290,6 @@ window.renderAll = () => {
     const target = new Date(t).toLocaleDateString('id-ID');
     const cf = document.getElementById('selCab').value; b.innerHTML = '';
     logs.filter(l => l.tanggal === target && (cf==='Semua' || l.cabang===cf)).forEach(l => {
-        // FIX BUG MAPS URL
         const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}`;
         b.innerHTML += `<tr>
             <td class="font-bold text-white uppercase">${l.nama}</td>
