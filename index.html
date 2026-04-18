@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kopi Setengah-4 v145</title>
+  <title>Kopi Setengah-4 v146</title>
   
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -146,10 +146,9 @@ const firebaseConfig = { apiKey: "AIzaSyChFAEgzpZac2yRvkb9r8f0kFT_j_ji1AA", auth
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// PEMBARUAN: TAMBAH ID KARYAWAN SUNTER
-const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin", "KS4-8073":"Sunter" };
+// v146: PERBAIKAN NAMA KARYAWAN SUNTER -> YOPI
+const STAFF = { "KS4-1902":"Adryan", "KS4-7721":"Riki", "KS4-3384":"Acong", "KS4-5510":"Oji", "KS4-8892":"David", "KS4-2104":"Fikri", "KS4-6637":"Rizki", "KS4-4429":"Kimoy", "KS4-9012":"Apin", "KS4-8073":"Yopi" };
 
-// PEMBARUAN: TAMBAH CABANG SUNTER DENGAN 2 SHIFT DAN KOORDINAT GPS BARU
 const CABANG = { 
     "Otista": {lat:-6.231607, lng:106.871947, s1:8, s2:15}, 
     "Tanjung Duren": {lat:-6.182202, lng:106.782300, s1:8, s2:15}, 
